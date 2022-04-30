@@ -1,0 +1,8 @@
+PROGETTO
+
+- Videochat: WebRTC, soluzioni di aziende, Scratch
+- App di messaggistica: Firebase
+- Storage dati: Firebase?, 
+- Modello: dove fare il deploy dei dati? Modulo in Python
+- UI: più avanti
+- Labeling messaggi: Notifica dopo Treshold tempo + numero messaggi
