@@ -6,3 +6,8 @@ PROGETTO
 - Modello: dove fare il deploy dei dati? Modulo in Python
 - UI: più avanti
 - Labeling messaggi: Notifica dopo Treshold tempo + numero messaggi
+
+
+1) Chat testuale 1a1: Firebase
+2) Quando la chat è pronta si va con l'emotion detection
+3) GUI un minimo curata
