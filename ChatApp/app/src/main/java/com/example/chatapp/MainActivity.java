@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, change activity
                             FirebaseUser user = mAuth.getCurrentUser();
+                            new FirebaseDbManager().addUserToDB(user);
                             Intent intent = new Intent(getApplicationContext(), Contacts.class);
                             startActivity(intent);
                         } else {

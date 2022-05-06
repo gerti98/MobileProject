@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,8 +22,6 @@ import java.util.ArrayList;
 
 
 public class Contacts extends AppCompatActivity {
-    private DatabaseReference db;
-    final private String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
     private ArrayList<User> contacts;
     final private AppCompatActivity thisActivity = this;
     final private String TAG = "ChatApp/Contacts";
@@ -39,30 +39,17 @@ public class Contacts extends AppCompatActivity {
             }
         });
 
-        db = FirebaseDatabase.getInstance(dbName).getReference();
         contacts = new ArrayList<>();
-        ValueEventListener userListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get the object and use the values to update the UI
-                System.out.println(dataSnapshot);
+        new FirebaseDbManager().initializeListener(this, contacts);
 
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    System.out.println(child);
-                    User result = child.getValue(User.class);
-                    Log.w(TAG, result.toString());
-                    contacts.add(result);
-                }
-                ListView lv = (ListView) findViewById(R.id.contacts_list_view);
-                lv.setAdapter(new ArrayAdapter<User>(thisActivity, android.R.layout.simple_list_item_1, contacts));
-            }
-
+        ListView lv = (ListView) findViewById(R.id.contacts_list_view);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting info failed
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(thisActivity, String.valueOf(i), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), Chat.class);
+                startActivity(intent);
             }
-        };
-        db.addValueEventListener(userListener);
+        });
     }
 }

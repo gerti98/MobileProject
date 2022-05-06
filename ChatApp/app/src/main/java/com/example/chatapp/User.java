@@ -2,15 +2,25 @@ package com.example.chatapp;
 
 public class User {
 
+    private String uid;
     private String name;
-    private String surname;
+    private String email;
 
     private User() {
     }
 
-    public User(String name, String surname) {
+    public User(String uid, String name, String email) {
+        this.uid = uid;
         this.name = name;
-        this.surname = surname;
+        this.email = email;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getName() {
@@ -21,16 +31,39 @@ public class User {
         this.name = name;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getEmail() {
+        return email;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
+    @Override
     public String toString() {
-        String ret = name + " - " + surname;
+       // String ret = uid + " - " + name + " - " + email;
+        String ret = name + " - " + email;
         return ret;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // If the object is compared with itself then return true
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof User)) {
+            return false;
+        }
+
+        // typecast u to User so that we can compare data members
+        User u = (User) o;
+
+        // Compare the data members and return accordingly
+        if(u.getEmail() == this.email)
+            return true;
+        else
+            return false;
     }
 }
