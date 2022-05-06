@@ -46,8 +46,9 @@ public class Contacts extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(thisActivity, String.valueOf(i), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(thisActivity, String.valueOf(i), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), Chat.class);
+                intent.putExtra("name", contacts.get(i).getName());
                 startActivity(intent);
             }
         });
