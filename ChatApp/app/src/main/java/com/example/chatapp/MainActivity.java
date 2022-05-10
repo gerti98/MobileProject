@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+
 public class MainActivity extends AppCompatActivity {
 
     final static String TAG = "MainActivity";
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         //Check if the user is already logged in, so that he can skip the login phase
         FirebaseUser user = mAuth.getCurrentUser();
         if(user!=null){
-            Intent intent = new Intent(getApplicationContext(), Contacts.class);
+            Intent intent = new Intent(getApplicationContext(), ContactsActivity.class);
             startActivity(intent);
         }
     }
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, change activity
                             FirebaseUser user = mAuth.getCurrentUser();
                             new FirebaseDbManager().addUserToDB(user);
-                            Intent intent = new Intent(getApplicationContext(), Contacts.class);
+                            Intent intent = new Intent(getApplicationContext(), ContactsActivity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(MainActivity.this, "Sorry auth failed.", Toast.LENGTH_SHORT).show();
@@ -108,5 +109,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 }

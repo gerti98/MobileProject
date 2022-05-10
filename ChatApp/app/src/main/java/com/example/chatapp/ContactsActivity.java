@@ -4,28 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 
-public class Contacts extends AppCompatActivity {
+public class ContactsActivity extends AppCompatActivity {
     private ArrayList<User> contacts;
     final private AppCompatActivity thisActivity = this;
     final private String TAG = "ChatApp/Contacts";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,15 +31,17 @@ public class Contacts extends AppCompatActivity {
         });
 
         contacts = new ArrayList<>();
-        new FirebaseDbManager().initializeListener(this, contacts);
+        new FirebaseDbManager("users").initializeUsersListener(this, contacts);
 
         ListView lv = (ListView) findViewById(R.id.contacts_list_view);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //Toast.makeText(thisActivity, String.valueOf(i), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), Chat.class);
-                intent.putExtra("name", contacts.get(i).getName());
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                //sending an intent about the user of the opened chat
+                intent.putExtra("chat_user_name", contacts.get(i).getName());
+                intent.putExtra("chat_user_uid", contacts.get(i).getUid());
                 startActivity(intent);
             }
         });
