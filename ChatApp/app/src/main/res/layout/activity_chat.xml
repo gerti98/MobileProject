@@ -64,10 +64,11 @@ android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/edit_text_message"
-        android:layout_width="match_parent"
+        android:layout_width="256dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="90dp"
         android:layout_toStartOf="@+id/send_msg_btn"
         android:background="@android:color/transparent"
         android:hint="Enter Message"
@@ -80,8 +81,19 @@ android:layout_height="match_parent">
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
         android:background="@drawable/ic_action_name"
         android:text="Send"
+        android:textColor="@color/black" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/send_rec_btn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="74dp"
+        android:background="@android:drawable/presence_audio_online"
+        android:text="SendRec"
         android:textColor="@color/black" />
 
 </RelativeLayout>
