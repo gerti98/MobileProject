@@ -78,17 +78,20 @@ public class ChatActivity extends AppCompatActivity {
         MessageRecycler.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, MessageRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
-                        Message msg = chatMessages.get(position);
+                       /* Message msg = chatMessages.get(position);
                         if(!msg.getIsAudio())
                             return;
                         Toast.makeText(thisActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
                         String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
-                        Long tsLong = System.currentTimeMillis()/1000;
-                        String ts = tsLong.toString();
                         receivedRecFilePath += msg.text;
 
-                        new FirebaseDbManager().downloadAudio(msg.text, receivedRecFilePath, thisActivity);
+                        new FirebaseDbManager().downloadAudio(msg.text, receivedRecFilePath, thisActivity);*/
 
+                        Message msg = chatMessages.get(position);
+                        if(!msg.getIsAudio())
+                            return;
+                        String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
+                        receivedRecFilePath += msg.text;
                         MediaPlayer mediaPlayer = MediaPlayer.create(thisActivity, Uri.parse(receivedRecFilePath));
                         mediaPlayer.start(); // no need to call prepare(); create() does that for you
                     }

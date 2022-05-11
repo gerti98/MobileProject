@@ -87,6 +87,15 @@ public class FirebaseDbManager {
                 messageList.add(result);
                 RecyclerView rv= (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
                 rv.setAdapter(new MessageAdapter(usersActivity, messageList));
+
+                // Download the audio message if it is an audio message
+                if(!result.getIsAudio())
+                    return;
+                Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
+                String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
+                receivedRecFilePath += result.text;
+
+                new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
             }
 
             @Override
