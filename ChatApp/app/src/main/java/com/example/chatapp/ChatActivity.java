@@ -21,6 +21,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.chatapp.util.Constants;
+import com.example.chatapp.util.JSONBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -60,23 +62,23 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
     private AppCompatActivity thisActivity = this;
     private boolean isRecording = false;
 
-    public String url = "https://mobile-group3.herokuapp.com/predict_emotion";
-    public static final MediaType JSON
-            = MediaType.get("application/json; charset=utf-8");
+    //TODO: move constants into a better place
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        Log.i(TAG, "Created Api request");
-        String json = "{ \"msgs\" : [\"I love you\", \"I love you\", \"I love you\"]}";
-        RestApi api = new RestApi();
-        api.setUICallback(this);
-        api.makeRequest(new Request.Builder()
-                .url(url)
-                .post(RequestBody.create(json, JSON))
-                .build());
+//        Log.i(TAG, "Created Api request");
+//        String json = JSONBuilder.buildMessageJSON(chatMessages);
+//        Log.i(TAG, "Sent JSON:" + json);
+//
+//        RestApi api = new RestApi();
+//        api.setUICallback(this);
+//        api.makeRequest(new Request.Builder()
+//                .url(Constants.URL_MESSAGES_REST_API)
+//                .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
+//                .build());
 
 
         //chat info

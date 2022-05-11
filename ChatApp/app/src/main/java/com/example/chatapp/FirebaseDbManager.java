@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chatapp.util.Constants;
+import com.example.chatapp.util.JSONBuilder;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +36,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 public class FirebaseDbManager {
     private DatabaseReference db;
@@ -102,6 +107,24 @@ public class FirebaseDbManager {
                 else {
                     //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
                     new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
+                }
+
+                Log.i(TAG, "Message");
+
+                //Rest Api Call
+                if (messageList.size() % Constants.REST_API_MESSAGE_SIZE == 0){
+                    Toast.makeText(usersActivity, "Created Api request", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "Created Api request");
+                    String json = JSONBuilder.buildMessageJSON(messageList);
+                    Log.i(TAG, "Sent JSON:" + json);
+
+                    RestApi api = new RestApi();
+                    api.setUICallback((UICallback) usersActivity);
+                    api.makeRequest(new Request.Builder()
+                            .url(Constants.URL_MESSAGES_REST_API)
+                            .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
+                            .build());
+
                 }
             }
 
