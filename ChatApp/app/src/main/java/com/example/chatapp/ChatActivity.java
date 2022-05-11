@@ -221,7 +221,22 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
     }
 
     @Override
-    public void onSuccess(String response) throws IOException {
-        Log.i(TAG, "Response: " + response);
+    public void onSuccess(String response) {
+        String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
+        Log.i(TAG, "Response: " + cleanResponse);
+        Log.i(TAG, "Response len: " + cleanResponse.length());
+
+        if (cleanResponse.equals("joy")) {
+            Log.i(TAG, "Joy change");
+            emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
+        } else if(cleanResponse.equals("neutral")) {
+            emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
+        } else if(cleanResponse.equals("sadness")) {
+            emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
+        } else if(cleanResponse.equals("fear")) {
+            emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
+        } else if(cleanResponse.equals("anger")) {
+            emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
+        }
     }
 }
