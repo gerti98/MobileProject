@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +29,11 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 
 /*ideas:
@@ -34,7 +41,7 @@ https://levelup.gitconnected.com/structure-firestore-firebase-for-scalable-chat-
 https://sendbird.com/developer/tutorials/android-chat-tutorial-building-a-messaging-ui
 https://www.youtube.com/watch?v=1mJv4XxWlu8&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=8
 */
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements UICallback{
     private FirebaseUser currentUser;
     private List<Message> chatMessages;
     private String chatUserName;
@@ -45,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
     private EditText editTextMsg;
     private Toolbar chatToolbar;
     private RecyclerView MessageRecycler;
+    private ImageView emotionImageView;
     private MediaRecorder rec;
     private String audioFilename;
     private String recFilePath;
@@ -52,10 +60,24 @@ public class ChatActivity extends AppCompatActivity {
     private AppCompatActivity thisActivity = this;
     private boolean isRecording = false;
 
+    public String url = "https://mobile-group3.herokuapp.com/predict_emotion";
+    public static final MediaType JSON
+            = MediaType.get("application/json; charset=utf-8");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        Log.i(TAG, "Created Api request");
+        String json = "{ \"msgs\" : [\"I love you\", \"I love you\", \"I love you\"]}";
+        RestApi api = new RestApi();
+        api.setUICallback(this);
+        api.makeRequest(new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(json, JSON))
+                .build());
+
 
         //chat info
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -71,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
         sendMsgBtn = findViewById(R.id.send_msg_btn);
         sendRecBtn = findViewById(R.id.send_rec_btn);
         editTextMsg = findViewById(R.id.edit_text_message);
+        emotionImageView = findViewById(R.id.emotion_imageview);
 
         //Recycler
         MessageRecycler = (RecyclerView) findViewById(R.id.recycler_gchat);
@@ -192,4 +215,13 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onFailure(String response) {
+        Log.i(TAG, "Response: " + response);
+    }
+
+    @Override
+    public void onSuccess(String response) throws IOException {
+        Log.i(TAG, "Response: " + response);
+    }
 }
