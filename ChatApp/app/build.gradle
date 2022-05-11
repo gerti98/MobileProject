@@ -36,6 +36,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
+
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
 
     implementation 'androidx.appcompat:appcompat:1.4.1'

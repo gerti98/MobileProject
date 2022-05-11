@@ -6,6 +6,7 @@ public class Message {
     String sender_name;
     String receiver_name;
     Long timestamp;
+    boolean isAudio;
 
     private Message(){
     }
@@ -15,7 +16,18 @@ public class Message {
         this.sender_name = sender_name;
         this.receiver_name = receiver_name;
         this.timestamp = timestamp;
+        this.isAudio = false;
     }
+
+    public Message(String text, String sender_name, String receiver_name, Long timestamp, boolean isAudio){
+        this.text = text;
+        this.sender_name = sender_name;
+        this.receiver_name = receiver_name;
+        this.timestamp = timestamp;
+        this.isAudio = isAudio;
+    }
+
+
 
     public String getText() {
         return text;
@@ -48,4 +60,8 @@ public class Message {
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
+
+    public boolean getIsAudio() { return isAudio; }
+
+    public void setIsAudio(boolean isAudio) { this.isAudio = isAudio; }
 }

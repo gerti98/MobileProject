@@ -1,5 +1,7 @@
 package com.example.chatapp;
 
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -10,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -19,7 +23,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -28,12 +37,15 @@ import java.util.List;
 
 public class FirebaseDbManager {
     private DatabaseReference db;
+    private StorageReference storage;
     final private String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
+    final private String storageName = "gs://chatapp-8aa46.appspot.com";
     final private String TAG = "ChatApp/DbManager";
     static boolean keychat_search; //used to perform keychat search
 
     public FirebaseDbManager() {
         this.db = FirebaseDatabase.getInstance(dbName).getReference();
+        this.storage = FirebaseStorage.getInstance().getReference();
     }
 
     public FirebaseDbManager(String reference) {
@@ -122,8 +134,60 @@ public class FirebaseDbManager {
         message.put("sender_name", sender);
         message.put("receiver_name", receiver);
         message.put("timestamp", ServerValue.TIMESTAMP);
+        message.put("isAudio", false);
         DatabaseReference chatsRef = db.child("chats");
 
         chatsRef.child(key_chat).child("messages").push().setValue(message);
     }
+
+    void addAudioToChat(String filePath, String filename, String key_chat, String sender, String receiver, AppCompatActivity chatActivity){
+        StorageReference audioPath = storage.child("audio").child(filename);
+        Uri localUri = Uri.fromFile(new File(filePath));
+
+        audioPath.putFile(localUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(chatActivity, "Registration uploaded succesfully", Toast.LENGTH_LONG).show();
+                HashMap<String, Object> message = new HashMap<>();
+                message.put("text", filename);
+                message.put("sender_name", sender);
+                message.put("receiver_name", receiver);
+                message.put("timestamp", ServerValue.TIMESTAMP);
+                message.put("isAudio", true);
+                DatabaseReference chatsRef = db.child("chats");
+
+                chatsRef.child(key_chat).child("messages").push().setValue(message);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(chatActivity, "Error during registration upload", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    void downloadAudio(String fileName, String whereToSave, AppCompatActivity chatActivity) {
+        String filePath = "audio/" + fileName;
+        StorageReference audioFileReference = storage.child(filePath);
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        audioFileReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                try (FileOutputStream fos = new FileOutputStream(whereToSave)) {
+                    fos.write(bytes);
+                    Toast.makeText(chatActivity, "Rec downloaded", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(chatActivity, "Error during registration download", Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(chatActivity, "Error during registration download", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
 }

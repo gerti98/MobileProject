@@ -46,8 +46,10 @@ public class ChatActivity extends AppCompatActivity {
     private Toolbar chatToolbar;
     private RecyclerView MessageRecycler;
     private MediaRecorder rec;
+    private String audioFilename;
     private String recFilePath;
     final private String TAG = "ChatApp/ChatActivity";
+    private AppCompatActivity thisActivity = this;
     private boolean isRecording = false;
 
     @Override
@@ -73,6 +75,29 @@ public class ChatActivity extends AppCompatActivity {
         //Recycler
         MessageRecycler = (RecyclerView) findViewById(R.id.recycler_gchat);
         MessageRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        MessageRecycler.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, MessageRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Message msg = chatMessages.get(position);
+                        if(!msg.getIsAudio())
+                            return;
+                        Toast.makeText(thisActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
+                        String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
+                        Long tsLong = System.currentTimeMillis()/1000;
+                        String ts = tsLong.toString();
+                        receivedRecFilePath += msg.text;
+
+                        new FirebaseDbManager().downloadAudio(msg.text, receivedRecFilePath, thisActivity);
+
+                        MediaPlayer mediaPlayer = MediaPlayer.create(thisActivity, Uri.parse(receivedRecFilePath));
+                        mediaPlayer.start(); // no need to call prepare(); create() does that for you
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        // do whatever
+                    }
+                })
+        );
 
         //initialize the listener for the messages
         new FirebaseDbManager("chats").initializeChatsListener(this, chatMessages, key_chat);
@@ -89,11 +114,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        // Registration button utils and listenere
-        // PAth to save rec
-        recFilePath = getExternalCacheDir().getAbsolutePath();
-        recFilePath += "/audiorecordtest.3gp";
-
+        // Registration button utils and listener
         Log.w(TAG, "File path:" + recFilePath);
 
         sendRecBtn.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +128,13 @@ public class ChatActivity extends AppCompatActivity {
                     stopRecording();
                 }
                 else {
+                    // Path to save rec
+                    recFilePath = getExternalCacheDir().getAbsolutePath();
+                    Long tsLong = System.currentTimeMillis()/1000;
+                    String ts = tsLong.toString();
+                    audioFilename = "/audio" + ts + ".aac";
+                    recFilePath += audioFilename;
+
                     isRecording = true;
                     int idBusyMic = getResources().getIdentifier("@android:drawable/presence_audio_busy", null, getPackageName());
                     Drawable busyMic = getResources().getDrawable(idBusyMic);
@@ -131,9 +159,9 @@ public class ChatActivity extends AppCompatActivity {
         Toast.makeText(this, "Recording Started", Toast.LENGTH_SHORT).show();
         rec = new MediaRecorder();
         rec.setAudioSource(MediaRecorder.AudioSource.MIC);
-        rec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        rec.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
         rec.setOutputFile(recFilePath);
-        rec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        rec.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         try {
             rec.prepare();
         } catch (IOException e) {
@@ -156,6 +184,8 @@ public class ChatActivity extends AppCompatActivity {
         // Temporary: only for testing purposes
         MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(recFilePath));
         mediaPlayer.start(); // no need to call prepare(); create() does that for you
+
+        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(), chatUserName, this);
     }
 
 
