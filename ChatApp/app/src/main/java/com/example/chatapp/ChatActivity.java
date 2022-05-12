@@ -1,6 +1,5 @@
 package com.example.chatapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,11 +10,8 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,13 +24,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -69,18 +61,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-//        Log.i(TAG, "Created Api request");
-//        String json = JSONBuilder.buildMessageJSON(chatMessages);
-//        Log.i(TAG, "Sent JSON:" + json);
-//
-//        RestApi api = new RestApi();
-//        api.setUICallback(this);
-//        api.makeRequest(new Request.Builder()
-//                .url(Constants.URL_MESSAGES_REST_API)
-//                .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
-//                .build());
-
 
         //chat info
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -128,30 +108,34 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                 })
         );
 
-
-        MessageRecycler.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+        //Handles the logic for sending messages to the model for emotion detection
+        MessageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
-            public void onChildViewAttachedToWindow(@NonNull View view) {
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
                 Log.i(TAG, "New message, total: " + chatMessages.size());
                 //Rest Api Call
-                if (chatMessages.size() % Constants.REST_API_MESSAGE_SIZE == 0){
-                    Log.i(TAG, "Created Api request");
-                    String json = JSONBuilder.buildMessageJSON(chatMessages);
-                    Log.i(TAG, "Sent JSON:" + json);
+                int message_size = chatMessages.size();
+                int fromIndex, lastIndex;
+                int remainder = message_size % Constants.REST_API_MESSAGE_SIZE;
 
-                    RestApi api = new RestApi();
-                    api.setUICallback((UICallback) thisActivity);
-                    api.makeRequest(new Request.Builder()
-                            .url(Constants.URL_MESSAGES_REST_API)
-                            .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
-                            .build());
+                //If chat is loaded, then it needs to be classified in the last classification result
+                if (message_size >= Constants.REST_API_MESSAGE_SIZE &&
+                        emotionImageView.getTag().equals("wait")) {
+                    Log.i(TAG, "Need of reclassification for page refresh");
+                    fromIndex = message_size - remainder - Constants.REST_API_MESSAGE_SIZE;
+                    lastIndex = message_size - remainder;
+                    Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
+                    List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
+                    performMessageClassification(sublist);
 
+                } else if (message_size >= Constants.REST_API_MESSAGE_SIZE && remainder == 0){
+                    Log.i(TAG, "Classificating chunk of messages");
+                    fromIndex = message_size - Constants.REST_API_MESSAGE_SIZE;
+                    lastIndex = message_size;
+                    Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
+                    List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
+                    performMessageClassification(sublist);
                 }
-            }
-
-            @Override
-            public void onChildViewDetachedFromWindow(@NonNull View view) {
-                Log.i(TAG, "onChildViewDetachedFromWindow");
             }
         });
 
@@ -260,14 +244,32 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
         if (cleanResponse.equals("joy")) {
             Log.i(TAG, "Joy change");
             emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
+            emotionImageView.setTag("joy");
         } else if(cleanResponse.equals("neutral")) {
             emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
+            emotionImageView.setTag("neutral");
         } else if(cleanResponse.equals("sadness")) {
             emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
+            emotionImageView.setTag("sadness");
         } else if(cleanResponse.equals("fear")) {
             emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
+            emotionImageView.setTag("fear");
         } else if(cleanResponse.equals("anger")) {
             emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
+            emotionImageView.setTag("fear");
         }
+    }
+
+    public void performMessageClassification(List<Message> subList){
+        String json = JSONBuilder.buildMessageJSON(subList);
+        Log.i(TAG, "Sent JSON:" + json);
+
+        RestApi api = new RestApi();
+        api.setUICallback((UICallback) thisActivity);
+        api.makeRequest(new Request.Builder()
+                .url(Constants.URL_MESSAGES_REST_API)
+                .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
+                .build());
+
     }
 }

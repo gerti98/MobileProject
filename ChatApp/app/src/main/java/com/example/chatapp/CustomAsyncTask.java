@@ -37,7 +37,10 @@ public class CustomAsyncTask extends AsyncTask {
 
     protected void onPostExecute(Object result) {
         try {
-            responseCallbacks.onSuccess((String) result);
+            if(result == null)
+                responseCallbacks.onFailure(null);
+            else
+                responseCallbacks.onSuccess((String) result);
         } catch (IOException e) {
             e.printStackTrace();
         }

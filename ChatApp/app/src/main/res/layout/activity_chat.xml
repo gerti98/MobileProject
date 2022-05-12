@@ -42,9 +42,10 @@
                 android:layout_height="match_parent"
                 android:layout_weight="6"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_neutral_emoji"
+                android:tag="wait"
+                app:srcCompat="@drawable/ic_wait"
                 tools:ignore="ImageContrastCheck"
-                tools:srcCompat="@drawable/ic_neutral_emoji" />
+                tools:srcCompat="@drawable/ic_wait" />
 
         </LinearLayout>
 
