@@ -1,5 +1,6 @@
 package com.example.chatapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -126,6 +127,34 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                     }
                 })
         );
+
+
+        MessageRecycler.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+            @Override
+            public void onChildViewAttachedToWindow(@NonNull View view) {
+                Log.i(TAG, "New message, total: " + chatMessages.size());
+                //Rest Api Call
+                if (chatMessages.size() % Constants.REST_API_MESSAGE_SIZE == 0){
+                    Log.i(TAG, "Created Api request");
+                    String json = JSONBuilder.buildMessageJSON(chatMessages);
+                    Log.i(TAG, "Sent JSON:" + json);
+
+                    RestApi api = new RestApi();
+                    api.setUICallback((UICallback) thisActivity);
+                    api.makeRequest(new Request.Builder()
+                            .url(Constants.URL_MESSAGES_REST_API)
+                            .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
+                            .build());
+
+                }
+            }
+
+            @Override
+            public void onChildViewDetachedFromWindow(@NonNull View view) {
+                Log.i(TAG, "onChildViewDetachedFromWindow");
+            }
+        });
+
 
         //initialize the listener for the messages
         new FirebaseDbManager("chats").initializeChatsListener(this, chatMessages, key_chat);

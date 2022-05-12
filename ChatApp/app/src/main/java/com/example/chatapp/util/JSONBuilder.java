@@ -10,7 +10,7 @@ public class JSONBuilder {
         if(messages != null) {
             for (Message message : messages)
                 if (!message.getIsAudio())
-                    json.append("\n").append(message.getText()).append("\n,");
+                    json.append("\"").append(message.getText()).append("\",");
             json.deleteCharAt(json.length()-1);
         }
         json.append("]}");

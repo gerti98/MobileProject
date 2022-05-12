@@ -2,14 +2,18 @@ package com.example.chatapp;
 
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chatapp.util.Constants;
+import com.example.chatapp.util.JSONBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.Format;
@@ -17,8 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
 // This class is to update the chat UI and to choose 2 different layout for received and sent messages
 public class MessageAdapter extends RecyclerView.Adapter {
+    private static final String TAG = "ChatApp/MessageAdapter";
     private Context messageContext;
     private List<Message> messageList;
     private static final int MESSAGE_SENT_TYPE = 1;
@@ -67,6 +75,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
     // it creates the message items for the chat and returns it
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int msgType) {
         View view;
+
 
         if (msgType == MESSAGE_SENT_TYPE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sender_msg_item, parent, false);

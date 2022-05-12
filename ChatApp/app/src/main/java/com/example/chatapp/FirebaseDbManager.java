@@ -108,24 +108,6 @@ public class FirebaseDbManager {
                     //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
                     new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
                 }
-
-                Log.i(TAG, "Message");
-
-                //Rest Api Call
-                if (messageList.size() % Constants.REST_API_MESSAGE_SIZE == 0){
-                    Toast.makeText(usersActivity, "Created Api request", Toast.LENGTH_SHORT).show();
-                    Log.i(TAG, "Created Api request");
-                    String json = JSONBuilder.buildMessageJSON(messageList);
-                    Log.i(TAG, "Sent JSON:" + json);
-
-                    RestApi api = new RestApi();
-                    api.setUICallback((UICallback) usersActivity);
-                    api.makeRequest(new Request.Builder()
-                            .url(Constants.URL_MESSAGES_REST_API)
-                            .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
-                            .build());
-
-                }
             }
 
             @Override
