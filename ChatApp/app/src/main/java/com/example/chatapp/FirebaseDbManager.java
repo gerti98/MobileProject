@@ -39,25 +39,43 @@ import java.util.List;
 
 public class FirebaseDbManager {
     private DatabaseReference db;
-    private FirebaseDatabase dbIstance;
+    private FirebaseDatabase dbInstance;
     private StorageReference storage;
     final private String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
     final private String storageName = "gs://chatapp-8aa46.appspot.com";
     final private String TAG = "ChatApp/DbManager";
 
     public FirebaseDbManager() {
-        this.dbIstance = FirebaseDatabase.getInstance(dbName);
+        this.dbInstance = FirebaseDatabase.getInstance(dbName);
         this.db = FirebaseDatabase.getInstance(dbName).getReference();
         this.storage = FirebaseStorage.getInstance().getReference();
     }
 
     public FirebaseDbManager(String reference) {
-        this.dbIstance = FirebaseDatabase.getInstance(dbName);
+        this.dbInstance = FirebaseDatabase.getInstance(dbName);
         this.db = FirebaseDatabase.getInstance(dbName).getReference(reference);
     }
 
     public FirebaseDatabase getFirebaseDbInstance(){
-        return dbIstance;
+        return dbInstance;
+    }
+
+    public void prova(String text){
+        final DatabaseReference dbRef= dbInstance.getReference("users");
+
+        //this reference match only email that starts with text
+        dbRef.orderByChild("email").startAt(text).endAt(text+"\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     // initialize the listener to update contacts UI
@@ -66,7 +84,6 @@ public class FirebaseDbManager {
         ValueEventListener usersListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println("Users listeners still running");
                 // Get the object and use the values to update the UI
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     User result = child.getValue(User.class);
@@ -93,26 +110,30 @@ public class FirebaseDbManager {
 
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-                System.out.println("Chats listeners still running");
-                Message result = dataSnapshot.getValue(Message.class);
-                messageList.add(result);
-                RecyclerView rv= (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
-                rv.setAdapter(new MessageAdapter(usersActivity, messageList));
-
-                // Download the audio message if it is an audio message
-                if(!result.getIsAudio())
-                    return;
-
-                String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
-                receivedRecFilePath += result.text;
-
-                File newFile = new File(receivedRecFilePath);
-                if(newFile.exists()) {
-                    //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
+                //if no users are logged in I remove the listener
+                if (FirebaseAuth.getInstance().getCurrentUser() == null){
+                    db.child(key_chat+"/messages").removeEventListener(this);
                 }
                 else {
-                    //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
-                    new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
+                    Message result = dataSnapshot.getValue(Message.class);
+                    messageList.add(result);
+                    RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
+                    rv.setAdapter(new MessageAdapter(usersActivity, messageList));
+
+                    // Download the audio message if it is an audio message
+                    if (!result.getIsAudio())
+                        return;
+
+                    String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
+                    receivedRecFilePath += result.text;
+
+                    File newFile = new File(receivedRecFilePath);
+                    if (newFile.exists()) {
+                        //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
+                        new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
+                    }
                 }
             }
 
@@ -154,7 +175,7 @@ public class FirebaseDbManager {
         newUserRef.setValue(toAdd); /*questo risetta tutte le volte i valori e fa partire i trigger su tutti i client*/
 
         //notifications creation if it does not already exists
-        DatabaseReference notificationIstanceRef = dbIstance.getReference().child("notifications").child(user.getUid());
+        DatabaseReference notificationIstanceRef = dbInstance.getReference().child("notifications").child(user.getUid());
         ValueEventListener eventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -223,7 +244,7 @@ public class FirebaseDbManager {
         notification.put("type", "messages");
         notification.put("checked", checked);
 
-        DatabaseReference notificationInstanceRef = dbIstance.getReference("notifications/"+receiver_uid+"/"+sender_uid);
+        DatabaseReference notificationInstanceRef = dbInstance.getReference("notifications/"+receiver_uid+"/"+sender_uid);
         notificationInstanceRef.setValue(notification);
     }
 

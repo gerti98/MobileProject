@@ -102,6 +102,11 @@ public class ChatActivity extends AppCompatActivity {
                 })
         );
 
+        //tell the notification handler to not show notification of the active user on the chat
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        intent.putExtra("user_active_chat", chatUserUid);
+        startService(intent);
+
         //initialize the listener for the messages
         new FirebaseDbManager("chats").initializeChatsListener(this, chatMessages, key_chat);
 

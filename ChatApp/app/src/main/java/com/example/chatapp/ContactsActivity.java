@@ -6,14 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -24,10 +28,12 @@ public class ContactsActivity extends AppCompatActivity {
     private ArrayList<User> contacts;
     final private AppCompatActivity thisActivity = this;
     final private String TAG = "ChatApp/Contacts";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        new FirebaseDbManager().prova("gxh");
         // Check Permission
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.RECORD_AUDIO) ==
@@ -41,8 +47,8 @@ public class ContactsActivity extends AppCompatActivity {
         }
 
         //Start notification service for the authenticated user
-        Intent intent_service = new Intent (getApplicationContext(), NotificationHandlerService.class);
-        startService(intent_service);
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        startService(intent);
 
         setContentView(R.layout.activity_contacts);
         findViewById(R.id.logout_button).setOnClickListener(new View.OnClickListener() {
@@ -62,6 +68,29 @@ public class ContactsActivity extends AppCompatActivity {
         contacts = new ArrayList<>();
         new FirebaseDbManager("users").initializeUsersListener(this, contacts);
 
+        //GUI
+
+        //search_box event definition
+        TextInputEditText search_box = (TextInputEditText) findViewById(R.id.search_box);
+        Context context = this;
+        search_box.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Toast.makeText(context, s, Toast.LENGTH_SHORT);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        //contacts_list event definition
         ListView lv = (ListView) findViewById(R.id.contacts_list_view);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -74,6 +103,16 @@ public class ContactsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //reset the service variable to get the notifications from all the users (null value)
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        intent.putExtra("user_active_chat", (String) null);
+        startService(intent);
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
