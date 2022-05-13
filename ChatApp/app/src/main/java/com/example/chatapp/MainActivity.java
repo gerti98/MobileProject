@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         //Check if the user is already logged in, so that he can skip the login phase
         FirebaseUser user = mAuth.getCurrentUser();
         if(user!=null){
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Check Permission
+        // Check Permissions
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.RECORD_AUDIO) ==
                 PackageManager.PERMISSION_GRANTED) {
@@ -60,6 +59,29 @@ public class MainActivity extends AppCompatActivity {
             requestPermissionLauncher.launch(
                     Manifest.permission.RECORD_AUDIO);
         }
+
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.FOREGROUND_SERVICE) ==
+                PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+        } else {
+            // You can directly ask for the permission.
+            // The registered ActivityResultCallback gets the result of this request.
+            requestPermissionLauncher.launch(
+                    Manifest.permission.FOREGROUND_SERVICE);
+        }
+
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) ==
+                PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+        } else {
+            // You can directly ask for the permission.
+            // The registered ActivityResultCallback gets the result of this request.
+            requestPermissionLauncher.launch(
+                    Manifest.permission.ACCESS_NOTIFICATION_POLICY);
+        }
+
 
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
@@ -126,9 +148,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, change activity
+                            //Sign in success
                             FirebaseUser user = mAuth.getCurrentUser();
                             new FirebaseDbManager().addUserToDB(user);
+
+                            //Start list of contacts activity
                             Intent intent = new Intent(getApplicationContext(), ContactsActivity.class);
                             startActivity(intent);
                         } else {
@@ -137,6 +161,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    // read from shared preferences the fire messaging token
+    /*public String readFiremessagingToken(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token = preferences.getString("firebaseMessagingToken", null);
+        return token;
+    }*/
+
+    //se non andasse fai una classe statica che ritorna il context
 
 
 }

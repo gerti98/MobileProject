@@ -112,7 +112,7 @@ public class ChatActivity extends AppCompatActivity {
                 String msg = editTextMsg.getText().toString();
                 if (!msg.equals("")){
                     editTextMsg.setText("");
-                    new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(), chatUserName, msg);
+                    new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(), chatUserName, chatUserUid, msg);
                 }
             }
         });
@@ -188,7 +188,8 @@ public class ChatActivity extends AppCompatActivity {
         MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(recFilePath));
         mediaPlayer.start(); // no need to call prepare(); create() does that for you
 
-        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(), chatUserName, this);
+        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(),
+        chatUserName, chatUserUid, this);
     }
 
 

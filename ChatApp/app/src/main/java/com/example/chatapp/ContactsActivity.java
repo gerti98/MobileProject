@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
@@ -39,13 +40,20 @@ public class ContactsActivity extends AppCompatActivity {
                     Manifest.permission.RECORD_AUDIO);
         }
 
-
+        //Start notification service for the authenticated user
+        Intent intent_service = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        startService(intent_service);
 
         setContentView(R.layout.activity_contacts);
         findViewById(R.id.logout_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
+                // stop tracking notification service
+                Intent auth_user = new Intent (getApplicationContext(), NotificationHandlerService.class);
+                stopService(auth_user);
+
+                // back to MainActivity
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                 startActivity(intent);
             }
