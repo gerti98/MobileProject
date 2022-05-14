@@ -6,15 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".ContactsActivity">
 
-    <Button
-        android:id="@+id/logout_button"
-        android:layout_width="56dp"
-        android:layout_height="49dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="2dp"
-        android:text="L"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/logout_button"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="2dp"
+            android:layout_weight="5"
+            android:text="L" />
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_box"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="59dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="1"
+            android:queryHint="Search..." />
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/contacts_list_view"
@@ -22,16 +37,6 @@
         android:layout_height="600dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="131dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_box"
-        android:layout_width="351dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="59dp"
-        android:layout_marginTop="1dp"
-        android:queryHint="Search..."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
