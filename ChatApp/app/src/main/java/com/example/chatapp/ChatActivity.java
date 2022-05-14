@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.JSONBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -135,6 +136,16 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                     Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
                     List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
                     performMessageClassification(sublist);
+                }
+
+                if(message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0){
+                    Log.i(TAG, "Labelling request");
+                    fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
+                    lastIndex = message_size;
+                    Log.i(TAG, "Created Labeling request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
+                    List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
+                    AlertDialogueFragment dialog = new AlertDialogueFragment(getApplicationContext(), sublist);
+                    dialog.show(getSupportFragmentManager(), "MyDialogFragmentTag");
                 }
             }
         });

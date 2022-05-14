@@ -5,4 +5,14 @@
     <string name="web_client_id">929176907328-hmuulsee3pe238egibflk6f0hutsn78v.apps.googleusercontent.com</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="emotions_array">
+        <item>angry</item>
+        <item>joy</item>
+        <item>sadness</item>
+        <item>neutral</item>
+        <item>fear</item>
+    </string-array>
+    <string name="message_column">Messages</string>
+    <string name="label_column">Labels</string>
+
 </resources>

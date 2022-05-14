@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.test_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialogueFragment dialog = new AlertDialogueFragment();
+                AlertDialogueFragment dialog = new AlertDialogueFragment(getApplicationContext(), null);
                 dialog.show(getSupportFragmentManager(), "MyDialogFragmentTag");
             }
         });
