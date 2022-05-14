@@ -12,8 +12,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
+import com.example.chatapp.FirebaseEvent.FirebaseEventHandler;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ public class ContactsActivity extends AppCompatActivity {
     private ArrayList<User> contacts;
     final private AppCompatActivity thisActivity = this;
     final private String TAG = "ChatApp/Contacts";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,21 +42,49 @@ public class ContactsActivity extends AppCompatActivity {
                     Manifest.permission.RECORD_AUDIO);
         }
 
-
+        //Start notification service for the authenticated user
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        startService(intent);
 
         setContentView(R.layout.activity_contacts);
         findViewById(R.id.logout_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
+
+                FirebaseEventHandler.detachAll();
+
+                //stop tracking notification service
+                Intent auth_user = new Intent (getApplicationContext(), NotificationHandlerService.class);
+                stopService(auth_user);
+
+                //back to MainActivity
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                 startActivity(intent);
             }
         });
 
         contacts = new ArrayList<>();
-        new FirebaseDbManager("users").initializeUsersListener(this, contacts);
 
+        //GUI
+
+        //search_box event definition, the search is by email
+        SearchView search_box = findViewById(R.id.search_box);
+        AppCompatActivity contextActivity = this;
+        search_box.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                new FirebaseDbManager().getSearchResult(search_box.getQuery().toString(), contacts, contextActivity);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        //contacts_list event definition
         ListView lv = (ListView) findViewById(R.id.contacts_list_view);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -66,6 +97,18 @@ public class ContactsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //reset the service variable to get the notifications from all the users (null value)
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        intent.putExtra("user_active_chat", (String) null);
+        //the service is already started, this will inform the service about the active user of the
+        //chat to show no longer notification about his messages.
+        startService(intent);
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =

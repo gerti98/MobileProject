@@ -1,5 +1,8 @@
 package com.example.chatapp;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
@@ -16,15 +19,16 @@ import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.JSONBuilder;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -32,8 +36,6 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,44 +44,56 @@ import okhttp3.RequestBody;
 
 public class FirebaseDbManager {
     private DatabaseReference db;
+    private FirebaseDatabase dbInstance;
     private StorageReference storage;
     final private String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
     final private String storageName = "gs://chatapp-8aa46.appspot.com";
     final private String TAG = "ChatApp/DbManager";
-    static boolean keychat_search; //used to perform keychat search
 
     public FirebaseDbManager() {
+        this.dbInstance = FirebaseDatabase.getInstance(dbName);
         this.db = FirebaseDatabase.getInstance(dbName).getReference();
         this.storage = FirebaseStorage.getInstance().getReference();
     }
 
     public FirebaseDbManager(String reference) {
+        this.dbInstance = FirebaseDatabase.getInstance(dbName);
         this.db = FirebaseDatabase.getInstance(dbName).getReference(reference);
     }
 
-    // initialize the listener to update contacts UI
-    void initializeUsersListener(AppCompatActivity contactsActivity, ArrayList<User> contacts) {
-        ValueEventListener usersListener = new ValueEventListener() {
+    public FirebaseDatabase getFirebaseDbInstance(){
+        return dbInstance;
+    }
+
+    public void getSearchResult(String text, ArrayList<User> contacts, AppCompatActivity contactsActivity){
+        final DatabaseReference dbRef= dbInstance.getReference("users");
+
+        //this reference match only email that starts with text
+        dbRef.orderByChild("email").startAt(text).endAt(text+"\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
+
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get the object and use the values to update the UI
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //clear the contacts list array
+                contacts.clear();
+                //Get the object and use the values to update the UI
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     User result = child.getValue(User.class);
+                    //not showing the current logged user in the search result
+                    if (result.getUid().equals(FirebaseAuth.getInstance().getUid())){
+                        continue;
+                    }
                     contacts.add(result);
                 }
+                //update the UI with the result of the search
                 ListView lv = (ListView) contactsActivity.findViewById(R.id.contacts_list_view);
                 lv.setAdapter(new ArrayAdapter<User>(contactsActivity, android.R.layout.simple_list_item_1, contacts));
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting info failed
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-            }
-        };
+            public void onCancelled(@NonNull DatabaseError error) {
 
-        //adding the listener to users collection
-        db.addValueEventListener(usersListener);
+            }
+        });
     }
 
     // initialize the listener to update the current chat UI
@@ -88,25 +102,30 @@ public class FirebaseDbManager {
 
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-                Message result = dataSnapshot.getValue(Message.class);
-                messageList.add(result);
-                RecyclerView rv= (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
-                rv.setAdapter(new MessageAdapter(usersActivity, messageList));
-
-                // Download the audio message if it is an audio message
-                if(!result.getIsAudio())
-                    return;
-
-                String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
-                receivedRecFilePath += result.text;
-
-                File newFile = new File(receivedRecFilePath);
-                if(newFile.exists()) {
-                    //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
+                //if no users are logged in I remove the listener
+                if (FirebaseAuth.getInstance().getCurrentUser() == null){
+                    db.child(key_chat+"/messages").removeEventListener(this);
                 }
                 else {
-                    //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
-                    new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
+                    Message result = dataSnapshot.getValue(Message.class);
+                    messageList.add(result);
+                    RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
+                    rv.setAdapter(new MessageAdapter(usersActivity, messageList));
+
+                    // Download the audio message if it is an audio message
+                    if (!result.getIsAudio())
+                        return;
+
+                    String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
+                    receivedRecFilePath += result.text;
+
+                    File newFile = new File(receivedRecFilePath);
+                    if (newFile.exists()) {
+                        //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
+                        new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
+                    }
                 }
             }
 
@@ -146,10 +165,26 @@ public class FirebaseDbManager {
         User toAdd = new User(user.getUid(), user.getDisplayName(), user.getEmail());
         DatabaseReference newUserRef = usersRef.child(user.getUid());
         newUserRef.setValue(toAdd); /*questo risetta tutte le volte i valori e fa partire i trigger su tutti i client*/
+
+        //notifications creation if it does not already exists
+        DatabaseReference notificationIstanceRef = dbInstance.getReference().child("notifications").child(user.getUid());
+        ValueEventListener eventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()) {
+                    notificationIstanceRef.setValue("");
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage());
+            }
+        };
+        notificationIstanceRef.addListenerForSingleValueEvent(eventListener);
     }
 
     // adding a new message to the chat, if chat does not exists it creates one
-    void addMessageToChat(String key_chat, String sender, String receiver, String msg){
+    void addMessageToChat(String key_chat, String sender, String receiver, String receiver_uid, String msg){
         HashMap<String, Object> message = new HashMap<>();
         message.put("text", msg);
         message.put("sender_name", sender);
@@ -159,9 +194,13 @@ public class FirebaseDbManager {
         DatabaseReference chatsRef = db.child("chats");
 
         chatsRef.child(key_chat).child("messages").push().setValue(message);
+
+        // send notification to receiver
+        updateMessageNotificationEntity(receiver_uid, sender, FirebaseAuth.getInstance().getUid(), false);
     }
 
-    void addAudioToChat(String filePath, String filename, String key_chat, String sender, String receiver, AppCompatActivity chatActivity){
+    void addAudioToChat(String filePath, String filename, String key_chat, String sender, String receiver, String receiver_uid,
+    AppCompatActivity chatActivity){
         StorageReference audioPath = storage.child("audio").child(filename);
         Uri localUri = Uri.fromFile(new File(filePath));
 
@@ -185,6 +224,20 @@ public class FirebaseDbManager {
                 Toast.makeText(chatActivity, "Error during registration upload", Toast.LENGTH_LONG).show();
             }
         });
+
+        // send notification to receiver
+        updateMessageNotificationEntity(receiver_uid, sender, FirebaseAuth.getInstance().getUid(), false);
+    }
+
+    // add a notification to the notification collection of the receiver
+    public void updateMessageNotificationEntity(String receiver_uid, String sender, String sender_uid, boolean checked){
+        HashMap<String, Object> notification = new HashMap<>();
+        notification.put("sender", sender);
+        notification.put("type", "messages");
+        notification.put("checked", checked);
+
+        DatabaseReference notificationInstanceRef = dbInstance.getReference("notifications/"+receiver_uid+"/"+sender_uid);
+        notificationInstanceRef.setValue(notification);
     }
 
     void downloadAudio(String fileName, String whereToSave, AppCompatActivity chatActivity) {
@@ -209,6 +262,5 @@ public class FirebaseDbManager {
             }
         });
     }
-
 
 }

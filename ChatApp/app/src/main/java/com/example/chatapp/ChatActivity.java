@@ -109,6 +109,12 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                 })
         );
 
+
+        //tell the notification handler to not show notification of the active user on the chat
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        intent.putExtra("user_active_chat", chatUserUid);
+        startService(intent);
+
         //Handles the logic for sending messages to the model for emotion detection
         MessageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -151,6 +157,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
         });
 
 
+
         //initialize the listener for the messages
         new FirebaseDbManager("chats").initializeChatsListener(this, chatMessages, key_chat);
 
@@ -161,7 +168,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                 String msg = editTextMsg.getText().toString();
                 if (!msg.equals("")){
                     editTextMsg.setText("");
-                    new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(), chatUserName, msg);
+                    new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(), chatUserName, chatUserUid, msg);
                 }
             }
         });
@@ -237,7 +244,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
         MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(recFilePath));
         mediaPlayer.start(); // no need to call prepare(); create() does that for you
 
-        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(), chatUserName, this);
+        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(),
+        chatUserName, chatUserUid, this);
     }
 
 
