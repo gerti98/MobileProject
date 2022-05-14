@@ -162,14 +162,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    // read from shared preferences the fire messaging token
-    /*public String readFiremessagingToken(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String token = preferences.getString("firebaseMessagingToken", null);
-        return token;
-    }*/
-
-    //se non andasse fai una classe statica che ritorna il context
 
 
 }

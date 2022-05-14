@@ -8,8 +8,8 @@
 
     <Button
         android:id="@+id/logout_button"
-        android:layout_width="55dp"
-        android:layout_height="48dp"
+        android:layout_width="56dp"
+        android:layout_height="49dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="2dp"
         android:text="L"
@@ -25,13 +25,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/search_box"
-        android:layout_width="334dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="61dp"
-        android:layout_marginTop="2dp"
-        android:hint="Search"
+        android:layout_width="351dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="59dp"
+        android:layout_marginTop="1dp"
+        android:queryHint="Search..."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

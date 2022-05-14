@@ -60,15 +60,28 @@ public class FirebaseDbManager {
         return dbInstance;
     }
 
-    public void prova(String text){
+    public void getSearchResult(String text, ArrayList<User> contacts, AppCompatActivity contactsActivity){
         final DatabaseReference dbRef= dbInstance.getReference("users");
 
         //this reference match only email that starts with text
         dbRef.orderByChild("email").startAt(text).endAt(text+"\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //clear the contacts list array
+                contacts.clear();
+                //Get the object and use the values to update the UI
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    User result = child.getValue(User.class);
+                    //not showing the current logged user in the search result
+                    if (result.getUid().equals(FirebaseAuth.getInstance().getUid())){
+                        continue;
+                    }
+                    contacts.add(result);
+                }
+                //update the UI with the result of the search
+                ListView lv = (ListView) contactsActivity.findViewById(R.id.contacts_list_view);
+                lv.setAdapter(new ArrayAdapter<User>(contactsActivity, android.R.layout.simple_list_item_1, contacts));
             }
 
             @Override
@@ -76,32 +89,6 @@ public class FirebaseDbManager {
 
             }
         });
-    }
-
-    // initialize the listener to update contacts UI
-    void initializeUsersListener(AppCompatActivity contactsActivity, ArrayList<User> contacts) {
-
-        ValueEventListener usersListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get the object and use the values to update the UI
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    User result = child.getValue(User.class);
-                    contacts.add(result);
-                }
-                ListView lv = (ListView) contactsActivity.findViewById(R.id.contacts_list_view);
-                lv.setAdapter(new ArrayAdapter<User>(contactsActivity, android.R.layout.simple_list_item_1, contacts));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting info failed
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-            }
-        };
-
-        //adding the listener to users collection
-        db.addValueEventListener(usersListener);
     }
 
     // initialize the listener to update the current chat UI
