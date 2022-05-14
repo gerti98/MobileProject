@@ -1,29 +1,121 @@
-package com.example.chatapp;
+package com.example.chatapp.adapter;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.util.Constants;
-import com.example.chatapp.util.JSONBuilder;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.chatapp.Message;
+import com.example.chatapp.R;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import okhttp3.Request;
-import okhttp3.RequestBody;
+public class LabelingAdapter extends RecyclerView.Adapter{
+    private static final String TAG = "LabelingFormActivity";
+    private static final int AUDIO_MESSAGE = 0;
+    private static final int TEXT_MESSAGE = 1;
 
+    private Context labelingContext;
+    private ArrayList<Message> messageList;
+
+    public LabelingAdapter(Context mContext, ArrayList<Message> mList) {
+        labelingContext = mContext;
+        messageList = mList;
+    }
+
+    // Determine the type of the message: sent or received
+    @Override
+    public int getItemViewType(int position) {
+        Message message = (Message) messageList.get(position);
+
+        Log.i(TAG, "getItemViwType of " + position);
+        //if the current user is in the sender, show his messages in sender pov
+        if (message.getIsAudio()) {
+            return AUDIO_MESSAGE;
+        } else {
+            return TEXT_MESSAGE;
+        }
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
+
+        Log.i(TAG, "onCreateViewHolder");
+
+
+        if (viewType == AUDIO_MESSAGE) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_labeling_item, parent, false);
+            return new AudioMessage(view);
+        } else if (viewType == TEXT_MESSAGE) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.text_labeling_item, parent, false);
+            return new TextMessage(view);
+        }
+
+        // unexpected behavior, no such type exists
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        Message message = (Message) messageList.get(position);
+        switch (holder.getItemViewType()) {
+            case AUDIO_MESSAGE:
+                ((AudioMessage) holder).bind(message);
+                break;
+            case TEXT_MESSAGE:
+                ((TextMessage) holder).bind(message);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return messageList.size();
+    }
+
+    // Inner classes to display sent AND received messages in a different way
+    // Using 2 different classes we can maintain 2 different styles for the messages
+    private class AudioMessage extends RecyclerView.ViewHolder {
+
+        AudioMessage(View itemView) {
+            super(itemView);
+        }
+
+        void bind(Message message) {
+
+        }
+    }
+
+    private class TextMessage extends RecyclerView.ViewHolder {
+        EditText messageText;
+        Spinner labelSpinner;
+
+        TextMessage(View itemView) {
+            super(itemView);
+            messageText = (EditText) itemView.findViewById(R.id.label_edit);
+            labelSpinner = (Spinner) itemView.findViewById(R.id.label_spinner);
+        }
+
+        void bind(Message message) {
+            messageText.setText(message.getText());
+        }
+    }
+
+}
+
+/*
 // This class is to update the chat UI and to choose 2 different layout for received and sent messages
 public class MessageAdapter extends RecyclerView.Adapter {
     private static final String TAG = "ChatApp/MessageAdapter";
@@ -61,7 +153,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = (Message) messageList.get(position);
 
-        
+
         switch (holder.getItemViewType()) {
             case MESSAGE_SENT_TYPE:
                 ((SentMessage) holder).bind(message);
@@ -73,7 +165,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    // it creates the message items for the chat and returns it
+    // it creates the message it ems for the chat and returns it
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int msgType) {
         View view;
 
@@ -131,3 +223,5 @@ public class MessageAdapter extends RecyclerView.Adapter {
     }
 
 }
+
+ */

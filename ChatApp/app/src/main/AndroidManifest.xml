@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -18,6 +19,9 @@
             android:enabled="true"
             android:exported="true"></service>
 
+        <activity
+            android:name=".LabelingFormActivity"
+            android:exported="false" />
         <activity
             android:name=".ChatActivity"
             android:exported="false" />

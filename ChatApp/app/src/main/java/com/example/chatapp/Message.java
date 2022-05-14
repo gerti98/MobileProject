@@ -1,7 +1,9 @@
 package com.example.chatapp;
 
+import java.io.Serializable;
+
 // class to represent a chat message
-public class Message {
+public class Message implements Serializable {
     String text;
     String sender_name;
     String receiver_name;
