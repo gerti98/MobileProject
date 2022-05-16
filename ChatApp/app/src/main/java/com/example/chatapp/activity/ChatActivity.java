@@ -24,12 +24,14 @@ import com.example.chatapp.NotificationHandlerService;
 import com.example.chatapp.R;
 import com.example.chatapp.RecyclerItemClickListener;
 import com.example.chatapp.connection.RestApi;
+import com.example.chatapp.util.EmotionProcessing;
 import com.example.chatapp.util.UICallback;
 import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.JSONBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -252,24 +254,26 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
     @Override
     public void onSuccess(String response) {
-        String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
-        Log.i(TAG, "Response: " + cleanResponse);
-        Log.i(TAG, "Response len: " + cleanResponse.length());
+        List<String> result = new Gson().fromJson(response, List.class);
+//        String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
+        Log.i(TAG, "Response: " + result);
+        Log.i(TAG, "Response len: " + result.size());
 
-        if (cleanResponse.equals("joy")) {
+        String winner = EmotionProcessing.getEmotionClassMajority(result);
+        if (winner.equals("joy")) {
             Log.i(TAG, "Joy change");
             emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
             emotionImageView.setTag("joy");
-        } else if(cleanResponse.equals("neutral")) {
+        } else if(winner.equals("neutral")) {
             emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
             emotionImageView.setTag("neutral");
-        } else if(cleanResponse.equals("sadness")) {
+        } else if(winner.equals("sadness")) {
             emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
             emotionImageView.setTag("sadness");
-        } else if(cleanResponse.equals("fear")) {
+        } else if(winner.equals("fear")) {
             emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
             emotionImageView.setTag("fear");
-        } else if(cleanResponse.equals("anger")) {
+        } else if(winner.equals("anger")) {
             emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
             emotionImageView.setTag("fear");
         }

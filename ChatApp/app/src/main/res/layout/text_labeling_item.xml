@@ -12,12 +12,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="10px"
             android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/label_edit"
-                android:layout_width="141dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20px"
+                android:layout_marginRight="20px"
                 android:layout_weight="1"
                 android:editable="false"
                 android:focusable="false"
@@ -27,8 +30,10 @@
 
             <Spinner
                 android:id="@+id/label_spinner"
-                android:layout_width="153dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="60px"
+                android:layout_marginRight="40px"
                 android:layout_weight="1"
                 android:entries="@array/emotions_array" />
 

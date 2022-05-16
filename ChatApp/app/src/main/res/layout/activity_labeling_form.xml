@@ -38,10 +38,24 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:weightSum="50">
+
         <Button
             android:id="@+id/submit_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="50px"
+            android:layout_marginRight="50px"
+            android:layout_marginBottom="10px"
+            android:layout_weight="1"
+            android:gravity="center"
             android:text="SUBMIT" />
 
     </LinearLayout>
