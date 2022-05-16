@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.activity;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -15,7 +15,11 @@ import android.widget.ListView;
 import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
+import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.FirebaseEvent.FirebaseEventHandler;
+import com.example.chatapp.NotificationHandlerService;
+import com.example.chatapp.R;
+import com.example.chatapp.dto.User;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -59,7 +63,7 @@ public class ContactsActivity extends AppCompatActivity {
                 stopService(auth_user);
 
                 //back to MainActivity
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
         });

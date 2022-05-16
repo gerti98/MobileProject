@@ -14,6 +14,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.chatapp.FirebaseEvent.FirebaseEventHandler;
+import com.example.chatapp.activity.ChatActivity;
+import com.example.chatapp.connection.FirebaseDbManager;
+import com.example.chatapp.dto.NotificationMessageEntity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -81,7 +84,7 @@ public class NotificationHandlerService extends Service {
                         //just update the status of the notification
                         if(child.getKey().equals(activeUserChat)){
                             new FirebaseDbManager("notifications").updateMessageNotificationEntity(FirebaseAuth.getInstance()
-                            .getUid(), nEntity.sender, child.getKey(), true);
+                            .getUid(), nEntity.getSender(), child.getKey(), true);
                             continue;
                         }
                         //define the pending intent to open the chat on click action
@@ -118,7 +121,7 @@ public class NotificationHandlerService extends Service {
 
                         //update checked field to true (notifications has been checked)
                         new FirebaseDbManager("notifications").updateMessageNotificationEntity(FirebaseAuth.getInstance()
-                        .getUid(), nEntity.sender, child.getKey(), true);
+                        .getUid(), nEntity.getSender(), child.getKey(), true);
                     }
                 }
             }

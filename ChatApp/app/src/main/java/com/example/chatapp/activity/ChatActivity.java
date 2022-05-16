@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,6 +18,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.chatapp.connection.FirebaseDbManager;
+import com.example.chatapp.dto.Message;
+import com.example.chatapp.NotificationHandlerService;
+import com.example.chatapp.R;
+import com.example.chatapp.RecyclerItemClickListener;
+import com.example.chatapp.connection.RestApi;
+import com.example.chatapp.util.UICallback;
 import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.JSONBuilder;
@@ -37,7 +44,7 @@ https://levelup.gitconnected.com/structure-firestore-firebase-for-scalable-chat-
 https://sendbird.com/developer/tutorials/android-chat-tutorial-building-a-messaging-ui
 https://www.youtube.com/watch?v=1mJv4XxWlu8&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=8
 */
-public class ChatActivity extends AppCompatActivity implements UICallback{
+public class ChatActivity extends AppCompatActivity implements UICallback {
     private FirebaseUser currentUser;
     private List<Message> chatMessages;
     private String chatUserName;
@@ -89,7 +96,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                         if(!msg.getIsAudio())
                             return;
                         String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
-                        receivedRecFilePath += msg.filename;
+                        receivedRecFilePath += msg.getFilename();
                         MediaPlayer mediaPlayer = MediaPlayer.create(thisActivity, Uri.parse(receivedRecFilePath));
                         mediaPlayer.start(); // no need to call prepare(); create() does that for you
                     }
@@ -275,7 +282,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
         RestApi api = new RestApi();
         api.setUICallback((UICallback) thisActivity);
         api.makeRequest(new Request.Builder()
-                .url(Constants.URL_MESSAGES_REST_API)
+                .url(Constants.URL_TEXT_MESSAGES_REST_API)
                 .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
                 .build());
 

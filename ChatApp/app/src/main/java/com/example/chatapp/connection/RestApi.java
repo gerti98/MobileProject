@@ -1,4 +1,7 @@
-package com.example.chatapp;
+package com.example.chatapp.connection;
+
+import com.example.chatapp.util.CustomAsyncTask;
+import com.example.chatapp.util.UICallback;
 
 import okhttp3.Request;
 
