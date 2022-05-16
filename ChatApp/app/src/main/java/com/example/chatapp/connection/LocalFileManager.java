@@ -1,4 +1,4 @@
-package com.example.chatapp.util;
+package com.example.chatapp.connection;
 
 import android.content.Context;
 import android.net.Uri;

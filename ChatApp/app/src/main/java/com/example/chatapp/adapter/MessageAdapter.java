@@ -1,28 +1,22 @@
-package com.example.chatapp;
+package com.example.chatapp.adapter;
 
 import android.content.Context;
-import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.util.Constants;
-import com.example.chatapp.util.JSONBuilder;
+import com.example.chatapp.R;
+import com.example.chatapp.dto.Message;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 // This class is to update the chat UI and to choose 2 different layout for received and sent messages
 public class MessageAdapter extends RecyclerView.Adapter {

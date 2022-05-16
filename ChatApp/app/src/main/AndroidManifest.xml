@@ -20,16 +20,16 @@
             android:exported="true"></service>
 
         <activity
-            android:name=".LabelingFormActivity"
+            android:name=".activity.LabelingFormActivity"
             android:exported="false" />
         <activity
-            android:name=".ChatActivity"
+            android:name=".activity.ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".ContactsActivity"
+            android:name=".activity.ContactsActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

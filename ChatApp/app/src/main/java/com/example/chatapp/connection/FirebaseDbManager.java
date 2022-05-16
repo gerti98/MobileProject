@@ -1,10 +1,6 @@
-package com.example.chatapp;
+package com.example.chatapp.connection;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -16,8 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.util.Constants;
-import com.example.chatapp.util.JSONBuilder;
+import com.example.chatapp.R;
+import com.example.chatapp.adapter.MessageAdapter;
+import com.example.chatapp.dto.Message;
+import com.example.chatapp.dto.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,7 +27,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -39,9 +36,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 public class FirebaseDbManager {
     private DatabaseReference db;
@@ -98,7 +92,7 @@ public class FirebaseDbManager {
     }
 
     // initialize the listener to update the current chat UI
-    void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat){
+    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat){
         ChildEventListener chatsListener = new ChildEventListener() {
 
             @Override
@@ -118,14 +112,14 @@ public class FirebaseDbManager {
                         return;
 
                     String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
-                    receivedRecFilePath += result.text;
+                    receivedRecFilePath += result.getText();
 
                     File newFile = new File(receivedRecFilePath);
                     if (newFile.exists()) {
                         //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
                     } else {
                         //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
-                        new FirebaseDbManager().downloadAudio(result.filename, receivedRecFilePath, usersActivity);
+                        new FirebaseDbManager().downloadAudio(result.getFilename(), receivedRecFilePath, usersActivity);
                     }
                 }
             }
@@ -153,7 +147,7 @@ public class FirebaseDbManager {
     }
 
 
-    void addUserToDB(FirebaseUser user) {
+    public void addUserToDB(FirebaseUser user) {
         Log.w(TAG, "Adding new user");
         Log.w(TAG, user.getUid());
         Log.w(TAG, user.getEmail());
@@ -185,7 +179,7 @@ public class FirebaseDbManager {
     }
 
     // adding a new message to the chat, if chat does not exists it creates one
-    void addMessageToChat(String key_chat, String sender, String receiver, String receiver_uid, String msg){
+    public void addMessageToChat(String key_chat, String sender, String receiver, String receiver_uid, String msg){
         HashMap<String, Object> message = new HashMap<>();
         message.put("text", msg);
         message.put("sender_name", sender);
@@ -200,8 +194,8 @@ public class FirebaseDbManager {
         updateMessageNotificationEntity(receiver_uid, sender, FirebaseAuth.getInstance().getUid(), false);
     }
 
-    void addAudioToChat(String filePath, String filename, String key_chat, String sender, String receiver, String receiver_uid,
-    AppCompatActivity chatActivity){
+    public void addAudioToChat(String filePath, String filename, String key_chat, String sender, String receiver, String receiver_uid,
+                               AppCompatActivity chatActivity){
         StorageReference audioPath = storage.child("audio").child(filename);
         Uri localUri = Uri.fromFile(new File(filePath));
 
@@ -273,7 +267,7 @@ public class FirebaseDbManager {
     }
 
 
-    void uploadJSONLabel(Uri filePath, String filenameInFirebase){
+    public void uploadJSONLabel(Uri filePath, String filenameInFirebase){
         if (filePath != null) {
             //displaying a progress dialog while upload is going on
 

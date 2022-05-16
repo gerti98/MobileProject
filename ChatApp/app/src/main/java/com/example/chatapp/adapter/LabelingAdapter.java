@@ -12,7 +12,7 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.Message;
+import com.example.chatapp.dto.Message;
 import com.example.chatapp.R;
 
 import java.util.ArrayList;

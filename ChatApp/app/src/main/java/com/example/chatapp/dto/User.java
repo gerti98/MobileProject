@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.dto;
 
 public class User {
     private String value;

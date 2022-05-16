@@ -1,6 +1,6 @@
 package com.example.chatapp.util;
 
-import com.example.chatapp.Message;
+import com.example.chatapp.dto.Message;
 
 import java.util.ArrayList;
 import java.util.List;

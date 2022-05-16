@@ -8,17 +8,9 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
-import android.os.Parcelable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.example.chatapp.ContactsActivity;
-import com.example.chatapp.LabelingFormActivity;
-import com.example.chatapp.Message;
-import com.example.chatapp.R;
+import com.example.chatapp.activity.LabelingFormActivity;
+import com.example.chatapp.dto.Message;
 
 import java.util.ArrayList;
 import java.util.List;

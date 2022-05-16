@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.util;
 
 import android.os.AsyncTask;
 import android.util.Log;
