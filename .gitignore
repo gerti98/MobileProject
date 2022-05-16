@@ -1,6 +1,5 @@
 ChatApp/.gradle
 ChatApp/.idea
-*.ipynb
 *.csv
 .DS_Store
 *.pyc
