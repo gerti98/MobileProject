@@ -3,6 +3,7 @@ package com.example.chatapp;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.SharedPreferences;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
@@ -124,7 +125,7 @@ public class FirebaseDbManager {
                         //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
                     } else {
                         //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
-                        new FirebaseDbManager().downloadAudio(result.text, receivedRecFilePath, usersActivity);
+                        new FirebaseDbManager().downloadAudio(result.filename, receivedRecFilePath, usersActivity);
                     }
                 }
             }
@@ -207,9 +208,17 @@ public class FirebaseDbManager {
         audioPath.putFile(localUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Find recording duration
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                mmr.setDataSource(filePath);
+                String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                double millSecond = Integer.parseInt(durationStr);
+
+                String textAudioMsg = "Audio Message - " + String.valueOf(millSecond/1000) + " s";
                 Toast.makeText(chatActivity, "Registration uploaded succesfully", Toast.LENGTH_LONG).show();
                 HashMap<String, Object> message = new HashMap<>();
-                message.put("text", filename);
+                message.put("text", textAudioMsg);
+                message.put("filename", filename);
                 message.put("sender_name", sender);
                 message.put("receiver_name", receiver);
                 message.put("timestamp", ServerValue.TIMESTAMP);
@@ -252,13 +261,13 @@ public class FirebaseDbManager {
                     fos.write(bytes);
                     Toast.makeText(chatActivity, "Rec downloaded", Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
-                    Toast.makeText(chatActivity, "Error during registration download", Toast.LENGTH_LONG).show();
+                    Toast.makeText(chatActivity, "Error during registration download " + fileName + " " + whereToSave, Toast.LENGTH_LONG).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(chatActivity, "Error during registration download", Toast.LENGTH_LONG).show();
+                Toast.makeText(chatActivity, "Error during registration download " + fileName + " " + whereToSave, Toast.LENGTH_LONG).show();
             }
         });
     }

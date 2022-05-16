@@ -98,7 +98,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                         if(!msg.getIsAudio())
                             return;
                         String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
-                        receivedRecFilePath += msg.text;
+                        receivedRecFilePath += msg.filename;
                         MediaPlayer mediaPlayer = MediaPlayer.create(thisActivity, Uri.parse(receivedRecFilePath));
                         mediaPlayer.start(); // no need to call prepare(); create() does that for you
                     }
