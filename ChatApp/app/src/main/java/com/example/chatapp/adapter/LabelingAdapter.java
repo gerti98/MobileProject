@@ -5,9 +5,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,10 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chatapp.Message;
 import com.example.chatapp.R;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class LabelingAdapter extends RecyclerView.Adapter{
     private static final String TAG = "LabelingFormActivity";
@@ -27,11 +24,28 @@ public class LabelingAdapter extends RecyclerView.Adapter{
 
     private Context labelingContext;
     private ArrayList<Message> messageList;
+    private ArrayList<ArrayList<Object>> messageAndLabels;
 
     public LabelingAdapter(Context mContext, ArrayList<Message> mList) {
         labelingContext = mContext;
         messageList = mList;
+        messageAndLabels = new ArrayList<>();
+        ArrayList<Object> temp;
+
+        for(Message m: messageList){
+            temp = new ArrayList<>();
+            temp.add(m);
+            temp.add("neutral");
+
+            messageAndLabels.add(temp);
+        }
     }
+
+
+    public ArrayList<ArrayList<Object>> getFormData(){
+        return messageAndLabels;
+    }
+
 
     // Determine the type of the message: sent or received
     @Override
@@ -73,10 +87,10 @@ public class LabelingAdapter extends RecyclerView.Adapter{
         Message message = (Message) messageList.get(position);
         switch (holder.getItemViewType()) {
             case AUDIO_MESSAGE:
-                ((AudioMessage) holder).bind(message);
+                ((AudioMessage) holder).bind(message, position);
                 break;
             case TEXT_MESSAGE:
-                ((TextMessage) holder).bind(message);
+                ((TextMessage) holder).bind(message, position);
         }
     }
 
@@ -88,31 +102,57 @@ public class LabelingAdapter extends RecyclerView.Adapter{
     // Inner classes to display sent AND received messages in a different way
     // Using 2 different classes we can maintain 2 different styles for the messages
     private class AudioMessage extends RecyclerView.ViewHolder {
+        EditText messageText;
+        Spinner labelSpinner;
+        int index;
 
         AudioMessage(View itemView) {
             super(itemView);
+            messageText = (EditText) itemView.findViewById(R.id.label_edit);
+            labelSpinner = (Spinner) itemView.findViewById(R.id.label_spinner);
         }
 
-        void bind(Message message) {
-
+        void bind(Message message, int position) {
+            this.index = position;
+            messageText.setText(message.getText());
         }
     }
 
     private class TextMessage extends RecyclerView.ViewHolder {
         EditText messageText;
         Spinner labelSpinner;
+        int index;
 
         TextMessage(View itemView) {
             super(itemView);
             messageText = (EditText) itemView.findViewById(R.id.label_edit);
             labelSpinner = (Spinner) itemView.findViewById(R.id.label_spinner);
+
+            labelSpinner.setOnItemSelectedListener(
+                    new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                            String selected = labelSpinner.getSelectedItem().toString();
+                            Log.i(TAG, "["+position+"] Spinner selected, value: " + labelSpinner.getSelectedItem().toString());
+                            Log.i(TAG, "["+position+"]["+1+"]Data before, value: " +   ((Message) messageAndLabels.get(position).get(0)).getText() + ", " + messageAndLabels.get(position).get(1));
+                            messageAndLabels.get(position).set(1, selected);
+                            Log.i(TAG, "["+position+"]["+1+"]Data then, value: " +   ((Message) messageAndLabels.get(position).get(0)).getText() + ", " + messageAndLabels.get(position).get(1));
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parentView) {
+                            // your code here
+                        }
+
+                    }
+            );
         }
 
-        void bind(Message message) {
+        void bind(Message message, int position) {
+            this.index = position;
             messageText.setText(message.getText());
         }
     }
-
 }
 
 /*

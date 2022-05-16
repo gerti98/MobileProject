@@ -272,4 +272,30 @@ public class FirebaseDbManager {
         });
     }
 
+
+    void uploadJSONLabel(Uri filePath, String filenameInFirebase){
+        if (filePath != null) {
+            //displaying a progress dialog while upload is going on
+
+            StorageReference jsonRef = storage.child("labels").child(filenameInFirebase);
+            jsonRef.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Log.i(TAG, "File Uploaded");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.i(TAG, exception.getMessage());
+                        }
+                    });
+        }
+        //if there is not any file
+        else {
+            Log.i(TAG, "Error");
+        }
+    }
+
 }

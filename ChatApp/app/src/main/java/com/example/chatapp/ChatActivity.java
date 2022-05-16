@@ -288,7 +288,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
         RestApi api = new RestApi();
         api.setUICallback((UICallback) thisActivity);
         api.makeRequest(new Request.Builder()
-                .url(Constants.URL_MESSAGES_REST_API)
+                .url(Constants.URL_TEXT_MESSAGES_REST_API)
                 .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
                 .build());
 
