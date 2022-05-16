@@ -2,6 +2,7 @@ from fileinput import filename
 from flask import Flask, request, jsonify
 from Utils.model import *
 from Utils.general_utils import *
+from audio_converter import *
 import pickle 
 import sys
 import logging
@@ -37,13 +38,18 @@ def predict_text_emotion():
 def predict_voice_emotion():
     time_counter = 0
     audio_file = request.files['file']
-    file_name = str(random.randint(0,100000)) + '.wav'
-    audio_file.save(file_name)
+    file_name = str(random.randint(0,100000))
+    file_name_aac = file_name + '.aac'
+    file_name_wav =  file_name + '.wav'
+    audio_file.save(file_name_aac)
 
-    features = extract_feature(file_name, mfcc=True, chroma=True, mel=True)
+    from_aac_to_wav(file_name_aac, file_name_wav)
+
+    features = extract_feature(file_name_wav, mfcc=True, chroma=True, mel=True)
     prediction = mlp_model.predict(features.reshape(1,-1))[0]
 
-    os.remove(file_name)
+    os.remove(file_name_aac)
+    os.remove(file_name_wav)
 
     return jsonify(prediction)
 
