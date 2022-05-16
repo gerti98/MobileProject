@@ -113,8 +113,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="74dp"
-            android:background="@android:drawable/presence_audio_online"
+            android:layout_marginEnd="71dp"
+            android:background="@drawable/mic_avail2"
             android:text="SendRec"
             android:textColor="@color/black" />
 

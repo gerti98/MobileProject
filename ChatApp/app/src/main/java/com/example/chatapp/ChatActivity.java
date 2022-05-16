@@ -181,8 +181,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
             public void onClick(View v) {
                 if(isRecording){
                     isRecording = false;
-                    int idOnlineMic = getResources().getIdentifier("@android:drawable/presence_audio_online", null, getPackageName());
-                    Drawable onlineMic = getResources().getDrawable(idOnlineMic);
+                    //int idOnlineMic = getResources().getIdentifier("@android:drawable/presence_audio_online", null, getPackageName());
+                    //int idOnlineMic = getResources().getIdentifier("@android:drawable/mic_avail.png", null, getPackageName());
+                    Drawable onlineMic = getResources().getDrawable(R.drawable.mic_avail2);
                     sendRecBtn.setBackground(onlineMic);
                     stopRecording();
                 }
@@ -195,8 +196,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback{
                     recFilePath += audioFilename;
 
                     isRecording = true;
-                    int idBusyMic = getResources().getIdentifier("@android:drawable/presence_audio_busy", null, getPackageName());
-                    Drawable busyMic = getResources().getDrawable(idBusyMic);
+                    //int idBusyMic = getResources().getIdentifier("@android:drawable/presence_audio_busy", null, getPackageName());
+                    //int idBusyMic = getResources().getIdentifier(R.drawable.mic_busy, null, getPackageName());
+                    Drawable busyMic = getResources().getDrawable(R.drawable.mic_busy);
                     sendRecBtn.setBackground(busyMic);
                     startRecording();
                 }
