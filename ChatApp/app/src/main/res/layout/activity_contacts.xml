@@ -6,38 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".ContactsActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="282dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="65dp"
+        android:layout_weight="5"
+        android:text="Logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/logout_button"
-            android:layout_width="match_parent"
-            android:layout_height="49dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="2dp"
-            android:layout_weight="5"
-            android:text="L" />
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search_box"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="59dp"
-            android:layout_marginTop="1dp"
-            android:layout_weight="1"
-            android:queryHint="Search..." />
-
-    </LinearLayout>
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_box"
+        android:layout_width="352dp"
+        android:layout_height="53dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="20dp"
+        android:layout_weight="1"
+        android:queryHint="Search..."
+        app:layout_constraintBottom_toTopOf="@+id/contacts_list_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <ListView
         android:id="@+id/contacts_list_view"
-        android:layout_width="409dp"
-        android:layout_height="600dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="131dp"
+        android:layout_width="410dp"
+        android:layout_height="550dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/search_box" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="117dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="117dp"
+        android:text="Search the user:"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logout_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
