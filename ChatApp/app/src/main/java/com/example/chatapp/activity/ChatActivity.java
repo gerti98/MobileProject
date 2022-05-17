@@ -29,6 +29,7 @@ import com.example.chatapp.util.UICallback;
 import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.JSONBuilder;
+import com.example.chatapp.util.wavClass;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
@@ -59,6 +60,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private RecyclerView MessageRecycler;
     private ImageView emotionImageView;
     private MediaRecorder rec;
+    private wavClass rectest;
     private String audioFilename;
     private String recFilePath;
     final private String TAG = "ChatApp/ChatActivity";
@@ -190,7 +192,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     recFilePath = getExternalCacheDir().getAbsolutePath();
                     Long tsLong = System.currentTimeMillis()/1000;
                     String ts = tsLong.toString();
-                    audioFilename = "/audio" + ts + ".aac";
+                    //audioFilename = "/audio" + ts + ".aac";
+                    audioFilename = "/audio" + ts + ".wav";
                     recFilePath += audioFilename;
 
                     isRecording = true;
@@ -214,7 +217,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
     private void startRecording() {
         Toast.makeText(this, "Recording Started", Toast.LENGTH_SHORT).show();
-        rec = new MediaRecorder();
+        /*rec = new MediaRecorder();
         rec.setAudioSource(MediaRecorder.AudioSource.MIC);
         rec.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
         rec.setOutputFile(recFilePath);
@@ -224,16 +227,21 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         } catch (IOException e) {
             Log.e(TAG, "prepare() failed");
         }
-        rec.start();
+        rec.start();*/
+        rectest = new wavClass(getExternalCacheDir().getAbsolutePath(), "/tempraw.raw", audioFilename);
+        rectest.startRecording();
+
     }
 
     private void stopRecording() {
         Toast.makeText(this, "Recording Stopped", Toast.LENGTH_SHORT).show();
-        rec.stop();
+        /*rec.stop();
         rec.reset();
         rec.release();
-        rec = null;
-
+        rec = null;*/
+        //wavClass rectest = new wavClass(recFilePath);
+        rectest.stopRecording();
+        rectest = null;
         sendAudio();
     }
 
