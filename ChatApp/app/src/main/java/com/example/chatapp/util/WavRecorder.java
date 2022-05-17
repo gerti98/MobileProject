@@ -1,22 +1,31 @@
 package com.example.chatapp.util;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.example.chatapp.activity.ChatActivity;
+import com.example.chatapp.activity.ContactsActivity;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-// Credit to: https://github.com/vishwakneelamegam/android-wav
+// Class modified for our purposes, the original one is provided by: https://github.com/vishwakneelamegam/android-wav
 
-public class wavClass {
+public class WavRecorder {
     String filePath = null;
-    //String tempRawFile = "temp_record.raw";
-    //String tempWavFile = "final_record.wav";
-    String tempRawFile = "temp_record.raw";
-    String tempWavFile = "final_record.wav";
+    String tempRawFile;
+    String wavFile;
     final int bpp = 16;
     int sampleRate = 44100;
     int channel = AudioFormat.CHANNEL_IN_STEREO;
@@ -25,26 +34,29 @@ public class wavClass {
     int bufferSize = 0;
     Thread recordingThread;
     boolean isRecording = false;
-    public wavClass(String path, String tempRawFile, String tempWavFile){
+    AppCompatActivity activity = null;
+
+    public WavRecorder(String path, String tempRawFile, String wavFilename){
         try{
             filePath = path;
             this.tempRawFile = tempRawFile;
-            this.tempWavFile = tempWavFile;
+            this.wavFile = wavFilename;
             bufferSize = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
         }
         catch (Exception e){
             e.printStackTrace();
         }
     }
+
     private String getPath(String name){
         try {
-            //return filePath + "/" + name;
             return filePath + name;
         }
         catch (Exception e){
             return null;
         }
     }
+
     private void writeRawData(){
         try{
             if(filePath != null) {
@@ -144,6 +156,8 @@ public class wavClass {
             e.printStackTrace();
         }
     }
+
+    // Because the check for permission is already done before calling this function
     @SuppressLint("MissingPermission")
     public void startRecording(){
         try{
@@ -160,6 +174,7 @@ public class wavClass {
             e.printStackTrace();
         }
     }
+
     public void stopRecording(){
         try{
             if(recorder != null) {
@@ -170,7 +185,7 @@ public class wavClass {
                 }
                 recorder.release();
                 recordingThread = null;
-                createWavFile(getPath(tempRawFile),getPath(tempWavFile));
+                createWavFile(getPath(tempRawFile),getPath(wavFile));
             }
         }
         catch (Exception e){

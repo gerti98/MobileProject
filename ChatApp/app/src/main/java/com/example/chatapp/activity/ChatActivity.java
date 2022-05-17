@@ -1,14 +1,18 @@
 package com.example.chatapp.activity;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,12 +33,11 @@ import com.example.chatapp.util.UICallback;
 import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.JSONBuilder;
-import com.example.chatapp.util.wavClass;
+import com.example.chatapp.util.WavRecorder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +62,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private Toolbar chatToolbar;
     private RecyclerView MessageRecycler;
     private ImageView emotionImageView;
-    private MediaRecorder rec;
-    private wavClass rectest;
+    private WavRecorder rec;
     private String audioFilename;
     private String recFilePath;
     final private String TAG = "ChatApp/ChatActivity";
@@ -192,7 +194,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     recFilePath = getExternalCacheDir().getAbsolutePath();
                     Long tsLong = System.currentTimeMillis()/1000;
                     String ts = tsLong.toString();
-                    //audioFilename = "/audio" + ts + ".aac";
                     audioFilename = "/audio" + ts + ".wav";
                     recFilePath += audioFilename;
 
@@ -217,31 +218,25 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
     private void startRecording() {
         Toast.makeText(this, "Recording Started", Toast.LENGTH_SHORT).show();
-        /*rec = new MediaRecorder();
-        rec.setAudioSource(MediaRecorder.AudioSource.MIC);
-        rec.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
-        rec.setOutputFile(recFilePath);
-        rec.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        try {
-            rec.prepare();
-        } catch (IOException e) {
-            Log.e(TAG, "prepare() failed");
+        rec = new WavRecorder(getExternalCacheDir().getAbsolutePath(), "/tempraw.raw", audioFilename);
+        // Check Permission
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+            rec.startRecording();
+        } else {
+            // You can directly ask for the permission.
+            // The registered ActivityResultCallback gets the result of this request.
+            requestPermissionLauncher.launch(
+                    Manifest.permission.RECORD_AUDIO);
         }
-        rec.start();*/
-        rectest = new wavClass(getExternalCacheDir().getAbsolutePath(), "/tempraw.raw", audioFilename);
-        rectest.startRecording();
-
     }
 
     private void stopRecording() {
         Toast.makeText(this, "Recording Stopped", Toast.LENGTH_SHORT).show();
-        /*rec.stop();
-        rec.reset();
-        rec.release();
-        rec = null;*/
-        //wavClass rectest = new wavClass(recFilePath);
-        rectest.stopRecording();
-        rectest = null;
+        rec.stopRecording();
+        rec = null;
         sendAudio();
     }
 
@@ -299,4 +294,16 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 .build());
 
     }
+
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            this.registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                    // app.
+                    rec.startRecording();
+                } else {
+                    Toast.makeText(this, "Since you do not give the permission you will not be able to send audio recording", Toast.LENGTH_SHORT).show();
+                    rec = null;
+                }
+            });
 }

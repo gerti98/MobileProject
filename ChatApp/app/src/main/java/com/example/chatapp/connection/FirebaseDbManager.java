@@ -116,9 +116,9 @@ public class FirebaseDbManager {
 
                     File newFile = new File(receivedRecFilePath);
                     if (newFile.exists()) {
-                        Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
                         new FirebaseDbManager().downloadAudio(result.getFilename(), receivedRecFilePath, usersActivity);
                     }
                 }
