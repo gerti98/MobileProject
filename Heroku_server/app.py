@@ -1,14 +1,13 @@
-from fileinput import filename
 from flask import Flask, request, jsonify
-from Utils.model import *
-from Utils.general_utils import *
-from audio_converter import *
+
 import pickle 
 import sys
 import logging
 import random
 import os
-import time
+
+from Utils.model import *
+from Utils.general_utils import *
 
 
 app = Flask(__name__)
@@ -36,8 +35,8 @@ def predict_text_emotion():
 
 @app.route('/predict_voice_emotion', methods=['POST'])
 def predict_voice_emotion():
-    time_counter = 0
     audio_file = request.files['file']
+
     file_name = str(random.randint(0,100000))
     file_name_aac = file_name + '.aac'
     file_name_wav =  file_name + '.wav'
