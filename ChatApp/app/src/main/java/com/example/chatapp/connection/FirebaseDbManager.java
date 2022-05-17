@@ -107,6 +107,8 @@ public class FirebaseDbManager {
                     RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
                     rv.setAdapter(new MessageAdapter(usersActivity, messageList));
 
+                    rv.scrollToPosition(messageList.size()-1);
+
                     // Download the audio message if it is an audio message
                     if (!result.getIsAudio())
                         return;
