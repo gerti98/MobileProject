@@ -2,6 +2,7 @@ package com.example.chatapp.activity;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -60,7 +61,11 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private ImageButton sendRecBtn;
     private EditText editTextMsg;
     private Toolbar chatToolbar;
+    private FirebaseDbManager fdm_chat;
+    private LinearLayoutManager layoutManager;
     private RecyclerView MessageRecycler;
+    private int howManyMsgToShow;
+    private final int MSG_TO_SHOW_INCREMENT = 5;
     private ImageView emotionImageView;
     private WavRecorder rec;
     private String audioFilename;
@@ -68,6 +73,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     final private String TAG = "ChatApp/ChatActivity";
     private AppCompatActivity thisActivity = this;
     private boolean isRecording = false;
+    private boolean stop;
 
     //TODO: move constants into a better place
 
@@ -93,8 +99,12 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         emotionImageView = findViewById(R.id.emotion_imageview);
 
         //Recycler
+        howManyMsgToShow = 15;
+        fdm_chat = new FirebaseDbManager("chats");
+
         MessageRecycler = (RecyclerView) findViewById(R.id.recycler_gchat);
-        MessageRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        layoutManager = new LinearLayoutManager(getApplicationContext());
+        MessageRecycler.setLayoutManager(layoutManager);
         MessageRecycler.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, MessageRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
@@ -112,6 +122,25 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     }
                 })
         );
+        stop = false;
+        MessageRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int id = layoutManager.findFirstCompletelyVisibleItemPosition();
+                Log.w(TAG, " Scrolling: " + String.valueOf(id) + " - text: " + chatMessages.get(id).getText());
+
+                if(id==0 && !stop){
+                    Log.w(TAG, " I need to have more messages, the last one seen is: " + String.valueOf(id));
+                    //addNewPost(postAdapter.getLastItemDate());
+                    chatMessages.clear();
+                    howManyMsgToShow += MSG_TO_SHOW_INCREMENT;
+                    fdm_chat.setFocusOnLast(false);
+                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat,howManyMsgToShow);
+                    stop = true;
+                }
+            }
+        });
 
 
         //tell the notification handler to not show notification of the active user on the chat
@@ -161,9 +190,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         });
 
 
-
         //initialize the listener for the messages
-        new FirebaseDbManager("chats").initializeChatsListener(this, chatMessages, key_chat);
+        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow);
 
         //a message is added to the database
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -205,6 +233,40 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             }
         });
     }
+
+    /*void getMoreMessages(String id){
+        Query ref = FirebaseDatabase.getInstance().getReference()
+                .child("database")
+                .child("post")
+                .orderByChild("date")
+                .startAt(id)
+                .limitToFirst(1);
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if (dataSnapshot.exists()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+                    if(!posts.contains(post)) {
+                        posts.add(post);
+                        postAdapter.setData(posts);
+                        postAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }*/
 
     // function to establish the unique key_chat identifier based on the user's uid of the chat
     public String establishKeychat(String uid1, String uid2){

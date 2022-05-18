@@ -41,9 +41,13 @@ public class FirebaseDbManager {
     private DatabaseReference db;
     private FirebaseDatabase dbInstance;
     private StorageReference storage;
+    private final int DEFAULT_MSG_SHOWN = 15;
+    private boolean focusOnLast = true;
+    ChildEventListener chatsListener;
     final private String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
     final private String storageName = "gs://chatapp-8aa46.appspot.com";
     final private String TAG = "ChatApp/DbManager";
+    int counter;
 
     public FirebaseDbManager() {
         this.dbInstance = FirebaseDatabase.getInstance(dbName);
@@ -92,8 +96,11 @@ public class FirebaseDbManager {
     }
 
     // initialize the listener to update the current chat UI
-    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat){
-        ChildEventListener chatsListener = new ChildEventListener() {
+    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat, int howManyMsgToShow){
+        if(howManyMsgToShow!=DEFAULT_MSG_SHOWN)
+            db.child(key_chat+"/messages").removeEventListener(chatsListener);
+        counter = 0;
+        chatsListener = new ChildEventListener() {
 
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
@@ -107,7 +114,13 @@ public class FirebaseDbManager {
                     RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
                     rv.setAdapter(new MessageAdapter(usersActivity, messageList));
 
-                    rv.scrollToPosition(messageList.size()-1);
+                    Log.w(TAG, "Focus on last is " + String.valueOf(focusOnLast));
+                    if(focusOnLast)
+                        rv.scrollToPosition(messageList.size()-1);
+                    else if(counter==0)
+                        counter++;
+                    else if(counter==5) // 5 is the increment of message set in ChatActivity
+                        focusOnLast = true;
 
                     // Download the audio message if it is an audio message
                     if (!result.getIsAudio())
@@ -145,9 +158,13 @@ public class FirebaseDbManager {
 
         };
         //adding the listener to the chat
-        db.child(key_chat+"/messages").addChildEventListener(chatsListener);
+        db.child(key_chat+"/messages").limitToLast(howManyMsgToShow).addChildEventListener(chatsListener);
+
     }
 
+    public void setFocusOnLast(boolean focusOnLast) {
+        this.focusOnLast = focusOnLast;
+    }
 
     public void addUserToDB(FirebaseUser user) {
         Log.w(TAG, "Adding new user");
