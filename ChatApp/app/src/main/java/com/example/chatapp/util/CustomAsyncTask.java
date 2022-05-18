@@ -10,7 +10,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CustomAsyncTask extends AsyncTask {
-    private static final String TAG = "AsyncTask";
+    private static final String TAG = "ChatActivity";
     private UICallback responseCallbacks;
 
     public CustomAsyncTask() {}
@@ -27,7 +27,10 @@ public class CustomAsyncTask extends AsyncTask {
         try {
             Response response = client.newCall(request).execute();
             result = response.body().string();
-            Log.i(TAG, "[HTTP request result]" + result);
+            Log.i(TAG, "[HTTP request result #1]" + result);
+//            response = client.newCall(request).execute();
+//            result = response.body().string();
+//            Log.i(TAG, "[HTTP request result #"+counter+"]" + result);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,6 +39,7 @@ public class CustomAsyncTask extends AsyncTask {
     }
 
     protected void onPostExecute(Object result) {
+        Log.i(TAG, "[HTTP request onPostExecute]" + result);
         try {
             if(result == null)
                 responseCallbacks.onFailure(null);

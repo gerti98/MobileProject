@@ -1,0 +1,29 @@
+OLGERTI XHANEJ
+
+Total Commits: 
+Number of lines of code:
+ 
+
+Diary of non-coding activities:
+
+30/04/2022
+
+Group Meeting: discussion about possible solutions regarding the implementation of the videochat architecture
+
+05/05/2022
+
+Group Meeting: discussion about difficulties on implementing videochat app: WebRTC needs additional server to share metadata and there is a general lack of documentation for the Android solution. Chosen to switch project aim into chat app with the possibility to send audio messages to diversificate input sources.
+
+10/05/2022
+
+Group Meeting: Discussion about proper deploy service to host Rest API for emotion classification. Sharing of application progresses: messages and login with Google implemented
+
+13/05/2022
+
+Group Meeting: Discussion about possible solution for implementing emotion detection of voice-based input. Chosen the utilization of an additional SVM neural network that takes mfcc coefficients as shown in the related paper
+
+17/05/2022
+
+Group Meeting: Discussion about deploying problems due to Heroku slug size limitation for the free version after the deployment of the second model for classifying voice-based inputs
+
+
