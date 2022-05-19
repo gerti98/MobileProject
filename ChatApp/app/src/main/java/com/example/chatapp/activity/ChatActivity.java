@@ -3,6 +3,7 @@ package com.example.chatapp.activity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -10,11 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,9 +42,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -159,6 +169,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
         //Handles the logic for sending messages to the model for emotion detection
         MessageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @SuppressLint("NewApi")
             @Override
             public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
                 Log.i(TAG, "New message, total: " + chatMessages.size());
@@ -175,7 +186,11 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     lastIndex = message_size - remainder;
                     Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
                     List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
-                    performMessageClassification(sublist);
+                    try {
+                        performMessageClassification(sublist);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                 } else if (message_size >= Constants.REST_API_MESSAGE_SIZE && remainder == 0){
                     Log.i(TAG, "Classificating chunk of messages");
@@ -183,10 +198,14 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     lastIndex = message_size;
                     Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
                     List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
-                    performMessageClassification(sublist);
+                    try {
+                        performMessageClassification(sublist);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                if(message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0){
+                if(message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
                     Log.i(TAG, "Labelling request");
                     fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
                     lastIndex = message_size;
@@ -327,13 +346,21 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     }
 
     @Override
-    public void onSuccess(String response) {
-        List<String> result = new Gson().fromJson(response, List.class);
-//        String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
-        Log.i(TAG, "Response: " + result);
-        Log.i(TAG, "Response len: " + result.size());
+    public void onSuccess(List<String> responses) {
+        List<String> mergedResult = new ArrayList<>();
+        List<String> result;
+        for(String response: responses) {
+            if(!response.contains("[")){
+                String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
+                mergedResult.add(cleanResponse);
+            } else {
+                result = new Gson().fromJson(response, List.class);
+                mergedResult.addAll(result);
+            }
+        }
+        Log.i(TAG, "Response len: " + mergedResult.size());
 
-        String winner = EmotionProcessing.getEmotionClassMajority(result);
+        String winner = EmotionProcessing.getEmotionClassMajority(mergedResult);
         if (winner.equals("joy")) {
             Log.i(TAG, "Joy change");
             emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
@@ -353,17 +380,60 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         }
     }
 
-    public void performMessageClassification(List<Message> subList){
-        String json = JSONBuilder.buildMessageJSON(subList);
-        Log.i(TAG, "Sent JSON:" + json);
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void performMessageClassification(List<Message> subList) throws IOException {
+
+        List<Message> audioList = new ArrayList<Message>();
+        List<Message> textList = new ArrayList<Message>();
+
+        for(Message m: subList){
+            if(m.getIsAudio())
+                audioList.add(m);
+            else
+                textList.add(m);
+        }
+
+        String json_text = JSONBuilder.buildMessageTextJSON(subList);
+        Log.i(TAG, "Sent JSON:" + json_text);
+
+        List<Request> requests = new ArrayList<>();
+
+        if(!textList.isEmpty()){
+            requests.add(new Request.Builder()
+                    .url(Constants.URL_TEXT_MESSAGES_REST_API)
+                    .post(RequestBody.create(json_text, Constants.JSON_MEDIATYPE))
+                    .build());
+        }
+
+        for(Message m: audioList){
+            //Create audio request
+            String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
+            receivedRecFilePath += m.getFilename();
+//            Path path = Paths.get(receivedRecFilePath);
+
+            File file = new File(receivedRecFilePath);
+            Log.i(TAG, "Loading audio file named: " + receivedRecFilePath);
+
+            if(file.canRead()){
+                Log.i(TAG, "CAN READ");
+            } else {
+                Log.i(TAG, "CANNOT READ");
+
+            }
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("file", "file",
+                            RequestBody.create(file, MediaType.parse("audio/vnd.wave")))
+                    .build();
+            requests.add(new Request.Builder()
+                    .url(Constants.URL_VOICE_MESSAGES_REST_API)
+                    .post(requestBody)
+                    .build());
+        }
+
 
         RestApi api = new RestApi();
         api.setUICallback((UICallback) thisActivity);
-        api.makeRequest(new Request.Builder()
-                .url(Constants.URL_TEXT_MESSAGES_REST_API)
-                .post(RequestBody.create(json, Constants.JSON_MEDIATYPE))
-                .build());
-
+        api.makeRequests(requests);
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
