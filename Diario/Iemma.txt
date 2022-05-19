@@ -1,0 +1,40 @@
+FRANCESCO IEMMA
+
+Total Commits:
+Number of lines of code:
+
+
+NON-CODING ACTIVITIES:
+
+
+30/04/2022
+Group Meeting: discussion about possible solutions regarding the implementation of the videochat architecture.
+
+
+05/05/2022
+Group Meeting: discussion about the issues regarding the implementation of videochat app: WebRTC needs additional server to share metadata and there is a general lack of documentation for the Android solution. Chosen to change project going from a videochat app to a textual/vocal chat app.
+
+
+06/05/2022
+Study of Firebase: how to read and write data and which is the best database to use for messages and contacts between Firebase Realtime Database (the one choosen at the end) and Firebase Database.
+
+
+10/05/2022
+Group Meeting: Discussion about proper deploy service to host Rest API for emotion classification.
+Documentation read in order to implement audio recording and the sending of those audio records.
+
+
+13/05/2022
+Group Meeting: Discussion about possible solution for implementing emotion detection of voice-based input and also about the implementation of the labelling system. Chosen the utilization of an additional MLP neural network that takes MFCC coefficients.
+
+
+16/05/2022
+Meeting with Lorenzo Massagli: Discussion about the voice detection implementation. In particular we have discussed how the app and server communicates and which is the audio format required by the classifier.
+
+
+17/05/2022
+Group Meeting: Discussion regarding deploying problems due to Heroku slug size limitation for the free version after the deployment of the second model for classifying voice-based inputs. Discussion on the next steps and on the work division.
+
+
+18/05/2022
+Researched and read material and documentation in order to implement the dynamic load of messages when the user scrolls
