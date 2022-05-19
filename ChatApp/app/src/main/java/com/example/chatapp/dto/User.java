@@ -1,5 +1,8 @@
 package com.example.chatapp.dto;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class User {
     private String value;
     private String uid;
@@ -13,6 +16,16 @@ public class User {
         this.uid = uid;
         this.name = name;
         this.email = email;;
+    }
+
+    public User (JSONObject json) {
+        try {
+            this.name = json.getString("name");
+            this.uid = json.getString("uid");
+            this.email = json.getString("email");
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getUid() {
@@ -37,6 +50,18 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("uid", uid);
+            jsonObject.put("name", name);
+            jsonObject.put("email", email);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     @Override

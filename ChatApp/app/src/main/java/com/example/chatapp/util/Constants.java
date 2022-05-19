@@ -7,8 +7,9 @@ public class Constants {
     public final static int REST_API_MESSAGE_SIZE = 5;
     public final static int LABELLING_API_MESSAGE_SIZE = 8;
 
-
     public final static String URL_TEXT_MESSAGES_REST_API = "https://mobile-group3.herokuapp.com/predict_text_emotion";
     public static final MediaType JSON_MEDIATYPE = MediaType.get("application/json; charset=utf-8");
+
+    public final static int MAX_FAVORITES_LIST_SIZE = 50;
 
 }

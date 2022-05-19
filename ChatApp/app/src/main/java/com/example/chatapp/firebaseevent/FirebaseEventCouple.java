@@ -1,9 +1,10 @@
-package com.example.chatapp.FirebaseEvent;
+package com.example.chatapp.firebaseevent;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+// this class represents a database reference and its associated firebase event
 class FirebaseEventCouple{
     private DatabaseReference dbRef;
     private ValueEventListener evValue = null;
@@ -23,6 +24,7 @@ class FirebaseEventCouple{
         return this;
     }
 
+    //detach the firebase event from the database reference
     public void detachEvent(){
         if (evValue == null){
             dbRef.removeEventListener(evChild);

@@ -42,7 +42,8 @@
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_box" />
+        app:layout_constraintTop_toBottomOf="@+id/search_box"
+        android:descendantFocusability="blocksDescendants" />
 
     <TextView
         android:id="@+id/textView3"
