@@ -129,14 +129,23 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 super.onScrolled(recyclerView, dx, dy);
                 int id = layoutManager.findFirstCompletelyVisibleItemPosition();
                 Log.w(TAG, " Scrolling: " + String.valueOf(id) + " - text: " + chatMessages.get(id).getText());
+                Log.w(TAG, " Last completely visible: " + String.valueOf(layoutManager.findLastCompletelyVisibleItemPosition()) + " - text: " + chatMessages.get(layoutManager.findLastCompletelyVisibleItemPosition()).getText());
+
+                // After the loading of the old messages if the user goes to the last message then focusOnLast is activated
+                if(layoutManager.findLastCompletelyVisibleItemPosition()==chatMessages.size()-1)
+                    fdm_chat.setFocusOnLast(true);
+
+                // To load more users after one loading the user need to scroll down and then up
+                if(id == 1 && stop)
+                    stop = false;
 
                 if(id==0 && !stop){
                     Log.w(TAG, " I need to have more messages, the last one seen is: " + String.valueOf(id));
-                    //addNewPost(postAdapter.getLastItemDate());
                     chatMessages.clear();
                     howManyMsgToShow += MSG_TO_SHOW_INCREMENT;
                     fdm_chat.setFocusOnLast(false);
-                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat,howManyMsgToShow);
+                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat, howManyMsgToShow, MSG_TO_SHOW_INCREMENT);
+                    //if(howManyMsgToShow>chatMessages.size())
                     stop = true;
                 }
             }
@@ -191,7 +200,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
 
         //initialize the listener for the messages
-        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow);
+        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow, MSG_TO_SHOW_INCREMENT);
 
         //a message is added to the database
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
