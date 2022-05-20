@@ -1,0 +1,15 @@
+{ 
+    "text_labels" : [
+        ["sss","angry"],
+        ["wowow","neutral"],
+        ["wowowoow","neutral"],
+        ["wowowoowowow","neutral"],
+        ["wowowowo","neutral"],
+        ["No problem my friend","neutral"],
+        ["I'm quite happy","neutral"],
+        ["I hope you're happy too","neutral"],
+        ["Because life is beautiful","neutral"],
+        ["But my life is incredible","neutral"]
+    ],  
+    "audio_labels" : []
+}

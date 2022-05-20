@@ -47,7 +47,7 @@ public class JSONBuilder {
             label = (String) labels.get(1);
 
             if(message.getIsAudio()){
-                json.append("[\"").append(message.getFilename()).append("\",").append("\"").append(label).append("\"],");
+                json.append("[\"").append(message.getFilename().replace("/", "")).append("\",").append("\"").append(label).append("\"],");
                 any_audio = true;
             }
         }

@@ -37,13 +37,13 @@
 
     <ListView
         android:id="@+id/contacts_list_view"
-        android:layout_width="410dp"
+        android:layout_width="0dp"
         android:layout_height="550dp"
         android:layout_marginTop="20dp"
+        android:descendantFocusability="blocksDescendants"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_box"
-        android:descendantFocusability="blocksDescendants" />
+        app:layout_constraintTop_toBottomOf="@+id/search_box" />
 
     <TextView
         android:id="@+id/textView3"
