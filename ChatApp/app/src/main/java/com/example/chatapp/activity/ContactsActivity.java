@@ -6,17 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
+import com.example.chatapp.adapter.ContactsAdapter;
+import com.example.chatapp.FavoritesHandler;
 import com.example.chatapp.connection.FirebaseDbManager;
-import com.example.chatapp.FirebaseEvent.FirebaseEventHandler;
+import com.example.chatapp.firebaseevent.FirebaseEventHandler;
 import com.example.chatapp.NotificationHandlerService;
 import com.example.chatapp.R;
 import com.example.chatapp.dto.User;
@@ -51,21 +52,23 @@ public class ContactsActivity extends AppCompatActivity {
         startService(intent);
 
         setContentView(R.layout.activity_contacts);
-        findViewById(R.id.logout_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
+        findViewById(R.id.logout_button).setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
 
-                FirebaseEventHandler.detachAll();
+            //detach all the firebase events regarding this account
+            FirebaseEventHandler.detachAll();
 
-                //stop tracking notification service
-                Intent auth_user = new Intent (getApplicationContext(), NotificationHandlerService.class);
-                stopService(auth_user);
+            //stop tracking notification service
+            Intent auth_user = new Intent (getApplicationContext(), NotificationHandlerService.class);
+            stopService(auth_user);
 
-                //back to MainActivity
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-            }
+            //save all the current favorites in the persistent file
+            /*FavoritesHandler.saveUserFavorites(getApplicationContext());
+            FavoritesHandler.clearFavoritesFromMemory();*/
+
+            //back to MainActivity
+            Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent1);
         });
 
         contacts = new ArrayList<>();
@@ -75,6 +78,7 @@ public class ContactsActivity extends AppCompatActivity {
         //search_box event definition, the search is by email
         SearchView search_box = findViewById(R.id.search_box);
         AppCompatActivity contextActivity = this;
+        Context context = getApplicationContext();
         search_box.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -84,23 +88,25 @@ public class ContactsActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (newText.equals(""))
+                    resetFavorites();
                 return false;
             }
         });
 
-        //contacts_list event definition
-        ListView lv = (ListView) findViewById(R.id.contacts_list_view);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //Toast.makeText(thisActivity, String.valueOf(i), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                //sending an intent about the user of the opened chat
-                intent.putExtra("chat_user_name", contacts.get(i).getName());
-                intent.putExtra("chat_user_uid", contacts.get(i).getUid());
-                startActivity(intent);
-            }
-        });
+        //load favorites from file
+        FavoritesHandler.loadUserFavorites(getApplicationContext());
+        resetFavorites();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        //when the activity stops the favorites are saved to the file
+        FavoritesHandler.saveUserFavorites(getApplicationContext());
+        if (FirebaseAuth.getInstance().getUid() == null) {
+            FavoritesHandler.clearFavoritesFromMemory();
+        }
     }
 
     @Override
@@ -113,6 +119,20 @@ public class ContactsActivity extends AppCompatActivity {
         //the service is already started, this will inform the service about the active user of the
         //chat to show no longer notification about his messages.
         startService(intent);
+
+        //reset the favorites again
+        resetFavorites();
+    }
+
+    // reset the favorites from memory
+    private void resetFavorites(){
+        ArrayList<User> usersList = FavoritesHandler.getFavoritesList();
+        contacts.clear();
+        if (usersList != null) {
+            contacts.addAll(usersList);
+        }
+        ListView lv = (ListView) findViewById(R.id.contacts_list_view);
+        lv.setAdapter(new ContactsAdapter(this, contacts));
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =

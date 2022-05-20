@@ -13,7 +13,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.chatapp.FirebaseEvent.FirebaseEventHandler;
+import com.example.chatapp.firebaseevent.FirebaseEventHandler;
 import com.example.chatapp.activity.ChatActivity;
 import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.dto.NotificationMessageEntity;
@@ -96,7 +96,7 @@ public class NotificationHandlerService extends Service {
 
                         //building a new notification
                         Notification.Builder notification = new Notification.Builder(context)
-                                .setSmallIcon(R.drawable.ic_msg_name)
+                                .setSmallIcon(R.drawable.ic_notification_icon)
                                 .setContentText("New Messages from " + nEntity.getSender())
                                 .setContentTitle("Chatapp")
                                 .setContentIntent(pendingIntent);

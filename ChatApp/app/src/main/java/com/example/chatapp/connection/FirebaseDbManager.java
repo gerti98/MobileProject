@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatapp.R;
+import com.example.chatapp.adapter.ContactsAdapter;
 import com.example.chatapp.adapter.MessageAdapter;
 import com.example.chatapp.dto.Message;
 import com.example.chatapp.dto.User;
@@ -68,7 +69,7 @@ public class FirebaseDbManager {
     public void getSearchResult(String text, ArrayList<User> contacts, AppCompatActivity contactsActivity){
         final DatabaseReference dbRef= dbInstance.getReference("users");
 
-        //this reference match only email that starts with text
+        //this reference match only email that starts with text, the event is listened one time
         dbRef.orderByChild("email").startAt(text).endAt(text+"\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -86,7 +87,8 @@ public class FirebaseDbManager {
                 }
                 //update the UI with the result of the search
                 ListView lv = (ListView) contactsActivity.findViewById(R.id.contacts_list_view);
-                lv.setAdapter(new ArrayAdapter<User>(contactsActivity, android.R.layout.simple_list_item_1, contacts));
+                /*lv.setAdapter(new ArrayAdapter<User>(contactsActivity, android.R.layout.simple_list_item_1, contacts));*/
+                lv.setAdapter(new ContactsAdapter(contactsActivity, contacts));
             }
 
             @Override
