@@ -135,6 +135,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 int id = layoutManager.findFirstCompletelyVisibleItemPosition();
+                if(id<0 || id>chatMessages.size())
+                    return;
                 Log.w(TAG, " Scrolling: " + String.valueOf(id) + " - text: " + chatMessages.get(id).getText());
                 Log.w(TAG, " Last completely visible: " + String.valueOf(layoutManager.findLastCompletelyVisibleItemPosition()) + " - text: " + chatMessages.get(layoutManager.findLastCompletelyVisibleItemPosition()).getText());
 
@@ -179,7 +181,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 }
 
                 //Check need of manual labelling
-                if(message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
+                Log.w(TAG, "Focus on last is " + String.valueOf(fdm_chat.getFocusOnLast()));
+                if(fdm_chat.getFocusOnLast() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
                     Log.i(TAG, "Labelling request");
                     fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
                     lastIndex = message_size;

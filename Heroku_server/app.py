@@ -43,7 +43,7 @@ def predict_voice_emotion():
     audio_file.save(file_name_to_convert)
     convert_wavs(file_name_to_convert, file_name_wav)
 
-    features = extract_feature(file_name_to_convert, mfcc=True, chroma=True, mel=True)
+    features = extract_feature(file_name_wav, mfcc=True, chroma=True, mel=True)
     prediction = mlp_model.predict(features.reshape(1,-1))[0]
 
     os.remove(file_name_to_convert)
