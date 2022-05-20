@@ -166,6 +166,8 @@ public class FirebaseDbManager {
         this.focusOnLast = focusOnLast;
     }
 
+    public boolean getFocusOnLast() { return this.focusOnLast; }
+
     public void addUserToDB(FirebaseUser user) {
         Log.w(TAG, "Adding new user");
         Log.w(TAG, user.getUid());
