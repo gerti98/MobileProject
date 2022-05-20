@@ -12,14 +12,15 @@
         android:id="@+id/contact_container"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="#2196F3"
+        android:background="#673AB7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/favorites_button"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:background="#00BCD4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_inactive_favorite"
@@ -30,9 +31,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="16dp"
         android:text="Email"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

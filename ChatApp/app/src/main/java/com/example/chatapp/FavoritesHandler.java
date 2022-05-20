@@ -1,4 +1,4 @@
-package com.example.chatapp.cache;
+package com.example.chatapp;
 
 import android.content.Context;
 import android.os.Environment;
@@ -24,26 +24,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-// General structure is: favorites object are maintained in memory and they are loaded only at login from a permanent file
-// the favorites are set with a maximum to not increase too much the memory load
+// This class handles the set of favorites of different logged user in this client
 public class FavoritesHandler {
-    private static HashMap<String, JSONObject> favoritesList; //to check fastly if a user is already present using uid (containsKey)
+    private static HashMap<String, JSONObject> favoritesList;
     private static String filename;
 
+    //load the favorites from file
     public static void loadUserFavorites(Context context) {
         filename = FirebaseAuth.getInstance().getUid() + "_favorites.json";
+
+        //trying to open the file
         FileInputStream fis = null;
-        boolean areFavoritesEmpty = true;
         try {
             fis = context.openFileInput(filename);
-            areFavoritesEmpty = initUserFavorites(fis);
-            System.out.println(favoritesList);
+            initUserFavorites(fis);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             favoritesList = null;
         }
 
-        //create a new file if it does not already exists
+        //if filename does not exists we create a new one
         if (favoritesList == null){
             File file = new File(context.getFilesDir(), filename);
             try {
@@ -56,11 +56,13 @@ public class FavoritesHandler {
         }
     }
 
-    private static boolean initUserFavorites(FileInputStream fis) {
+    //initialize the favorite's list
+    private static void initUserFavorites(FileInputStream fis) {
         InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
         StringBuilder stringBuilder = new StringBuilder();
         JSONArray favoritesJsonArray = new JSONArray();
 
+        //reading the file's content
         try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
             String line = reader.readLine();
             while (line != null) {
@@ -68,10 +70,10 @@ public class FavoritesHandler {
                 line = reader.readLine();
             }
         } catch (IOException e) {
-            // Error occurred when opening raw file for reading
             e.printStackTrace();
         }
 
+        //extracting the json array from the json string
         String jsonString = stringBuilder.toString();
         try {
             favoritesJsonArray = new JSONArray(jsonString);
@@ -79,19 +81,23 @@ public class FavoritesHandler {
             e.printStackTrace();
         }
 
+        favoritesList = new HashMap<>();
+
+        //if the array is empty, return
         if (favoritesJsonArray.isNull(0)) {
-            favoritesList = new HashMap<>();
-            return true;
+            return;
         }
+
+        //initialize the favorite's list
         for (int i=0; i<favoritesJsonArray.length(); i++){
             try {
                 JSONObject userJson = favoritesJsonArray.getJSONObject(i);
-                favoritesList.put(userJson.getString("uid"), userJson);
+                String key = userJson.getString("uid");
+                favoritesList.put(key, userJson);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
     public static ArrayList<User> getFavoritesList(){
@@ -105,6 +111,7 @@ public class FavoritesHandler {
         return usersList;
     }
 
+    //save the favorite's list to persistent json file
     public static void saveUserFavorites(Context context){
         JSONArray favoritesJsonArray = new JSONArray();
 

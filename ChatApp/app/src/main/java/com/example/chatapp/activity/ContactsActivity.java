@@ -10,14 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.chatapp.adapter.ContactsAdapter;
-import com.example.chatapp.cache.FavoritesHandler;
+import com.example.chatapp.FavoritesHandler;
 import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.firebaseevent.FirebaseEventHandler;
 import com.example.chatapp.NotificationHandlerService;
@@ -65,8 +63,8 @@ public class ContactsActivity extends AppCompatActivity {
             stopService(auth_user);
 
             //save all the current favorites in the persistent file
-            FavoritesHandler.saveUserFavorites(getApplicationContext());
-            FavoritesHandler.clearFavoritesFromMemory();
+            /*FavoritesHandler.saveUserFavorites(getApplicationContext());
+            FavoritesHandler.clearFavoritesFromMemory();*/
 
             //back to MainActivity
             Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
@@ -96,9 +94,19 @@ public class ContactsActivity extends AppCompatActivity {
             }
         });
 
-        //load favorites
+        //load favorites from file
         FavoritesHandler.loadUserFavorites(getApplicationContext());
         resetFavorites();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        //when the activity stops the favorites are saved to the file
+        FavoritesHandler.saveUserFavorites(getApplicationContext());
+        if (FirebaseAuth.getInstance().getUid() == null) {
+            FavoritesHandler.clearFavoritesFromMemory();
+        }
     }
 
     @Override
@@ -116,14 +124,15 @@ public class ContactsActivity extends AppCompatActivity {
         resetFavorites();
     }
 
+    // reset the favorites from memory
     private void resetFavorites(){
         ArrayList<User> usersList = FavoritesHandler.getFavoritesList();
+        contacts.clear();
         if (usersList != null) {
-            contacts.clear();
             contacts.addAll(usersList);
-            ListView lv = (ListView) findViewById(R.id.contacts_list_view);
-            lv.setAdapter(new ContactsAdapter(this, contacts));
         }
+        ListView lv = (ListView) findViewById(R.id.contacts_list_view);
+        lv.setAdapter(new ContactsAdapter(this, contacts));
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
