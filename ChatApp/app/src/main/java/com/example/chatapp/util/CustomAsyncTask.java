@@ -29,7 +29,7 @@ public class CustomAsyncTask extends AsyncTask {
     @Override
     protected List<String> doInBackground(Object... params) {
         OkHttpClient client = new OkHttpClient();
-        String result = null;
+        String result;
         int counter = 0;
 
         try {

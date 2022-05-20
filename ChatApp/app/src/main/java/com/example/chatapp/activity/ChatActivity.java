@@ -31,8 +31,9 @@ import com.example.chatapp.dto.Message;
 import com.example.chatapp.NotificationHandlerService;
 import com.example.chatapp.R;
 import com.example.chatapp.RecyclerItemClickListener;
-import com.example.chatapp.connection.RestApi;
+import com.example.chatapp.util.CustomAsyncTask;
 import com.example.chatapp.util.EmotionProcessing;
+import com.example.chatapp.util.EmotionClassificationLogic;
 import com.example.chatapp.util.UICallback;
 import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.example.chatapp.util.Constants;
@@ -44,9 +45,6 @@ import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -172,37 +170,15 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             @SuppressLint("NewApi")
             @Override
             public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-                Log.i(TAG, "New message, total: " + chatMessages.size());
-                //Rest Api Call
+//                Log.i(TAG, "New message, total: " + chatMessages.size());
+//                //Rest Api Call
                 int message_size = chatMessages.size();
                 int fromIndex, lastIndex;
-                int remainder = message_size % Constants.REST_API_MESSAGE_SIZE;
 
-                //If chat is loaded, then it needs to be classified in the last classification result
-                if (message_size >= Constants.REST_API_MESSAGE_SIZE &&
-                        emotionImageView.getTag().equals("wait")) {
-                    Log.i(TAG, "Need of reclassification for page refresh");
-                    fromIndex = message_size - remainder - Constants.REST_API_MESSAGE_SIZE;
-                    lastIndex = message_size - remainder;
-                    Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
-                    List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
-                    try {
-                        performMessageClassification(sublist);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                } else if (message_size >= Constants.REST_API_MESSAGE_SIZE && remainder == 0){
-                    Log.i(TAG, "Classificating chunk of messages");
-                    fromIndex = message_size - Constants.REST_API_MESSAGE_SIZE;
-                    lastIndex = message_size;
-                    Log.i(TAG, "Created Api request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
-                    List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
-                    try {
-                        performMessageClassification(sublist);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                EmotionClassificationLogic classificationLogic = new EmotionClassificationLogic();
+                List<Message> messagesToClassify = classificationLogic.getCommonMessagesToClassify(chatMessages, emotionImageView);
+                if(messagesToClassify.size() > 0){
+                    classificationLogic.performMessageClassification(getApplicationContext(), messagesToClassify, (UICallback) thisActivity);
                 }
 
                 if(message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
@@ -378,62 +354,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
             emotionImageView.setTag("fear");
         }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void performMessageClassification(List<Message> subList) throws IOException {
-
-        List<Message> audioList = new ArrayList<Message>();
-        List<Message> textList = new ArrayList<Message>();
-
-        for(Message m: subList){
-            if(m.getIsAudio())
-                audioList.add(m);
-            else
-                textList.add(m);
-        }
-
-        String json_text = JSONBuilder.buildMessageTextJSON(subList);
-        Log.i(TAG, "Sent JSON:" + json_text);
-
-        List<Request> requests = new ArrayList<>();
-
-        if(!textList.isEmpty()){
-            requests.add(new Request.Builder()
-                    .url(Constants.URL_TEXT_MESSAGES_REST_API)
-                    .post(RequestBody.create(json_text, Constants.JSON_MEDIATYPE))
-                    .build());
-        }
-
-        for(Message m: audioList){
-            //Create audio request
-            String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
-            receivedRecFilePath += m.getFilename();
-//            Path path = Paths.get(receivedRecFilePath);
-
-            File file = new File(receivedRecFilePath);
-            Log.i(TAG, "Loading audio file named: " + receivedRecFilePath);
-
-            if(file.canRead()){
-                Log.i(TAG, "CAN READ");
-            } else {
-                Log.i(TAG, "CANNOT READ");
-
-            }
-            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("file", "file",
-                            RequestBody.create(file, MediaType.parse("audio/vnd.wave")))
-                    .build();
-            requests.add(new Request.Builder()
-                    .url(Constants.URL_VOICE_MESSAGES_REST_API)
-                    .post(requestBody)
-                    .build());
-        }
-
-
-        RestApi api = new RestApi();
-        api.setUICallback((UICallback) thisActivity);
-        api.makeRequests(requests);
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
