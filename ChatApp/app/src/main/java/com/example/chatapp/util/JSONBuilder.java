@@ -40,7 +40,7 @@ public class JSONBuilder {
         }
         if(any_text)
             json.deleteCharAt(json.length()-1);
-        json.append("],  \"audio_labels\" :");
+        json.append("],  \"audio_labels\" : [");
 
         for (ArrayList<Object> labels : labelingFormData){
             message = (Message) labels.get(0);

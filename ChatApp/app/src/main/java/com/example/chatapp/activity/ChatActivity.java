@@ -169,8 +169,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             @SuppressLint("NewApi")
             @Override
             public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-//                Log.i(TAG, "New message, total: " + chatMessages.size());
-//                //Rest Api Call
                 int message_size = chatMessages.size();
                 int fromIndex, lastIndex;
 
@@ -180,6 +178,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     classificationLogic.performMessageClassification(getApplicationContext(), messagesToClassify, (UICallback) thisActivity);
                 }
 
+                //Check need of manual labelling
                 if(message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
                     Log.i(TAG, "Labelling request");
                     fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
