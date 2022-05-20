@@ -17,6 +17,7 @@ import com.example.chatapp.adapter.ContactsAdapter;
 import com.example.chatapp.adapter.MessageAdapter;
 import com.example.chatapp.dto.Message;
 import com.example.chatapp.dto.User;
+import com.example.chatapp.util.Constants;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,24 +43,22 @@ public class FirebaseDbManager {
     private DatabaseReference db;
     private FirebaseDatabase dbInstance;
     private StorageReference storage;
-    private int DEFAULT_MSG_SHOWN = 15;
     private boolean focusOnLast = true;
     int focusCounter;
     ChildEventListener chatsListener;
-    final private String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
-    final private String storageName = "gs://chatapp-8aa46.appspot.com";
+
     final private String TAG = "ChatApp/DbManager";
 
 
     public FirebaseDbManager() {
-        this.dbInstance = FirebaseDatabase.getInstance(dbName);
-        this.db = FirebaseDatabase.getInstance(dbName).getReference();
+        this.dbInstance = FirebaseDatabase.getInstance(Constants.dbName);
+        this.db = FirebaseDatabase.getInstance(Constants.dbName).getReference();
         this.storage = FirebaseStorage.getInstance().getReference();
     }
 
     public FirebaseDbManager(String reference) {
-        this.dbInstance = FirebaseDatabase.getInstance(dbName);
-        this.db = FirebaseDatabase.getInstance(dbName).getReference(reference);
+        this.dbInstance = FirebaseDatabase.getInstance(Constants.dbName);
+        this.db = FirebaseDatabase.getInstance(Constants.dbName).getReference(reference);
     }
 
     public FirebaseDatabase getFirebaseDbInstance(){
@@ -100,7 +99,7 @@ public class FirebaseDbManager {
 
     // initialize the listener to update the current chat UI
     public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat, int howManyMsgToShow, int increment){
-        if(howManyMsgToShow!=DEFAULT_MSG_SHOWN)
+        if(howManyMsgToShow!= Constants.DEFAULT_MSG_SHOWN)
             db.child(key_chat+"/messages").removeEventListener(chatsListener);
         focusCounter = 0;
         chatsListener = new ChildEventListener() {
@@ -135,12 +134,8 @@ public class FirebaseDbManager {
                     receivedRecFilePath += result.getFilename();
 
                     File newFile = new File(receivedRecFilePath);
-                    if (newFile.exists()) {
-                        //Toast.makeText(usersActivity, "Rec already exists", Toast.LENGTH_SHORT).show();
-                    } else {
-                        //Toast.makeText(usersActivity, "Audio downloading", Toast.LENGTH_SHORT).show();
+                    if (!newFile.exists())
                         new FirebaseDbManager().downloadAudio(result.getFilename(), receivedRecFilePath, usersActivity);
-                    }
                 }
             }
 

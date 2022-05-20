@@ -73,7 +73,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private LinearLayoutManager layoutManager;
     private RecyclerView MessageRecycler;
     private int howManyMsgToShow;
-    private final int MSG_TO_SHOW_INCREMENT = 5;
     private ImageView emotionImageView;
     private WavRecorder rec;
     private String audioFilename;
@@ -150,9 +149,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 if(id==0 && !stop){
                     Log.w(TAG, " I need to have more messages, the last one seen is: " + String.valueOf(id));
                     chatMessages.clear();
-                    howManyMsgToShow += MSG_TO_SHOW_INCREMENT;
+                    howManyMsgToShow += Constants.MSG_TO_SHOW_INCREMENT;
                     fdm_chat.setFocusOnLast(false);
-                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat, howManyMsgToShow, MSG_TO_SHOW_INCREMENT);
+                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat, howManyMsgToShow, Constants.MSG_TO_SHOW_INCREMENT);
                     //if(howManyMsgToShow>chatMessages.size())
                     stop = true;
                 }
@@ -195,7 +194,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
 
         //initialize the listener for the messages
-        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow, MSG_TO_SHOW_INCREMENT);
+        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow, Constants.MSG_TO_SHOW_INCREMENT);
 
         //a message is added to the database
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -238,39 +237,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         });
     }
 
-    /*void getMoreMessages(String id){
-        Query ref = FirebaseDatabase.getInstance().getReference()
-                .child("database")
-                .child("post")
-                .orderByChild("date")
-                .startAt(id)
-                .limitToFirst(1);
-        ref.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if (dataSnapshot.exists()) {
-                    Post post = dataSnapshot.getValue(Post.class);
-                    if(!posts.contains(post)) {
-                        posts.add(post);
-                        postAdapter.setData(posts);
-                        postAdapter.notifyDataSetChanged();
-                    }
-                }
-            }
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            }
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-    }*/
 
     // function to establish the unique key_chat identifier based on the user's uid of the chat
     public String establishKeychat(String uid1, String uid2){
@@ -307,10 +273,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     }
 
     private void sendAudio() {
-        // Temporary: only for testing purposes
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(recFilePath));
-        mediaPlayer.start(); // no need to call prepare(); create() does that for you
-
+        // Uncomment only for debuggin purposes
+        // MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(recFilePath));
+        // mediaPlayer.start(); // no need to call prepare(); create() does that for you
         new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(),
         chatUserName, chatUserUid, this);
     }
