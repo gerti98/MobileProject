@@ -29,9 +29,12 @@
             android:name=".activity.ContactsActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.ClassificationInfoActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.MainActivity"
             android:exported="true">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

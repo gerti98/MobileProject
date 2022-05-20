@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.R;
-import com.example.chatapp.fragment.AlertDialogueFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;

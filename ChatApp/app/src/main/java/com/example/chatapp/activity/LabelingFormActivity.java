@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.chatapp.RecyclerItemClickListener;
 import com.example.chatapp.connection.FirebaseDbManager;
@@ -74,6 +75,7 @@ public class LabelingFormActivity extends AppCompatActivity {
                 String ts = tsLong.toString();
                 String jsonFilename = "/labeling" + ts + ".json";
                 Uri uri = new LocalFileManager().createFileFromString(jsonToSend, jsonFilename, getApplicationContext());
+
 
                 new FirebaseDbManager().uploadJSONLabel(uri, jsonFilename);
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);

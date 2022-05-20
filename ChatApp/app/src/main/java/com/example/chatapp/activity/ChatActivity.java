@@ -3,7 +3,6 @@ package com.example.chatapp.activity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -17,13 +16,14 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.connection.FirebaseDbManager;
@@ -31,27 +31,20 @@ import com.example.chatapp.dto.Message;
 import com.example.chatapp.NotificationHandlerService;
 import com.example.chatapp.R;
 import com.example.chatapp.RecyclerItemClickListener;
-import com.example.chatapp.util.CustomAsyncTask;
+import com.example.chatapp.fragment.EmotionClassificationBySenderAlertDialogueFragment;
 import com.example.chatapp.util.EmotionProcessing;
 import com.example.chatapp.util.EmotionClassificationLogic;
 import com.example.chatapp.util.UICallback;
-import com.example.chatapp.fragment.AlertDialogueFragment;
+import com.example.chatapp.fragment.LabelingRequiredAlertDialogueFragment;
 import com.example.chatapp.util.Constants;
-import com.example.chatapp.util.JSONBuilder;
 import com.example.chatapp.util.WavRecorder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 
 /*ideas:
@@ -60,6 +53,7 @@ https://sendbird.com/developer/tutorials/android-chat-tutorial-building-a-messag
 https://www.youtube.com/watch?v=1mJv4XxWlu8&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=8
 */
 public class ChatActivity extends AppCompatActivity implements UICallback {
+    private EmotionClassificationBySenderAlertDialogueFragment alertDialogueFragment;
     private FirebaseUser currentUser;
     private List<Message> chatMessages;
     private String chatUserName;
@@ -106,6 +100,15 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         sendRecBtn = findViewById(R.id.send_rec_btn);
         editTextMsg = findViewById(R.id.edit_text_message);
         emotionImageView = findViewById(R.id.emotion_imageview);
+        emotionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ClassificationInfoActivity.class);
+                intent.putExtra("messages", (Serializable) chatMessages);
+                intent.putExtra("displayName", currentUser.getDisplayName());
+                startActivity(intent);
+            }
+        });
 
         //Recycler
         howManyMsgToShow = 15;
@@ -179,10 +182,10 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 int message_size = chatMessages.size();
                 int fromIndex, lastIndex;
 
-                EmotionClassificationLogic classificationLogic = new EmotionClassificationLogic();
+                EmotionClassificationLogic classificationLogic = new EmotionClassificationLogic(chatUserName);
                 List<Message> messagesToClassify = classificationLogic.getCommonMessagesToClassify(chatMessages, emotionImageView);
                 if(messagesToClassify.size() > 0){
-                    classificationLogic.performMessageClassification(getApplicationContext(), messagesToClassify, (UICallback) thisActivity);
+                    classificationLogic.performMessageClassification(getApplicationContext(), messagesToClassify, (UICallback) thisActivity, 0);
                 }
 
                 //Check need of manual labelling
@@ -194,7 +197,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     lastIndex = message_size;
                     Log.i(TAG, "Created Labeling request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
                     List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
-                    AlertDialogueFragment dialog = new AlertDialogueFragment(getApplicationContext(), sublist, chatUserName, chatUserUid);
+                    LabelingRequiredAlertDialogueFragment dialog = new LabelingRequiredAlertDialogueFragment(getApplicationContext(), sublist, chatUserUid, chatUserName);
                     dialog.show(getSupportFragmentManager(), "MyDialogFragmentTag");
                 }
             }
@@ -301,8 +304,11 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         Log.i(TAG, "Response: " + response);
     }
 
+    /**
+     * @param type: 0 if chat emoji, 1 if your emoji, 2 if peer emoji
+     */
     @Override
-    public void onSuccess(List<String> responses) {
+    public void onSuccess(List<String> responses, int type) {
         List<String> mergedResult = new ArrayList<>();
         List<String> result;
         for(String response: responses) {
@@ -315,7 +321,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             }
         }
         Log.i(TAG, "Response len: " + mergedResult.size());
-
         String winner = EmotionProcessing.getEmotionClassMajority(mergedResult);
         if (winner.equals("joy")) {
             Log.i(TAG, "Joy change");

@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AlertDialogueFragment extends DialogFragment {
+public class LabelingRequiredAlertDialogueFragment extends DialogFragment {
     Context applicationContext;
     String chatUsername;
     String chatUserId;
     ArrayList<Message> messages;
 
-    public AlertDialogueFragment(Context context, List<Message> messages, String username, String userid){
+    public LabelingRequiredAlertDialogueFragment(Context context, List<Message> messages, String userid, String username){
         this.applicationContext = context;
         this.messages = new ArrayList<Message>(messages);
         this.chatUserId = userid;

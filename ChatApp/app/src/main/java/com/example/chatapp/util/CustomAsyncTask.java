@@ -2,6 +2,7 @@ package com.example.chatapp.util;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,10 +17,12 @@ public class CustomAsyncTask extends AsyncTask {
     private UICallback responseCallbacks;
     private List<Request> requestList;
     private List<String> results;
+    private int type;
 
-    public CustomAsyncTask(List<Request> requestList) {
+    public CustomAsyncTask(List<Request> requestList, int type) {
         this.requestList = requestList;
         this.results = new ArrayList<>();
+        this.type = type;
     }
 
     public void setResponseCallbacks(UICallback callbacks) {
@@ -55,7 +58,7 @@ public class CustomAsyncTask extends AsyncTask {
             if(results_string.isEmpty())
                 responseCallbacks.onFailure(null);
             else
-                responseCallbacks.onSuccess(results_string);
+                responseCallbacks.onSuccess(results_string, type);
         } catch (IOException e) {
             e.printStackTrace();
         }

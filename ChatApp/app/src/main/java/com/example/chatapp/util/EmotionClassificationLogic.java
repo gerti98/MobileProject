@@ -8,11 +8,10 @@ import android.widget.ImageView;
 import androidx.annotation.RequiresApi;
 
 import com.example.chatapp.dto.Message;
-import com.example.chatapp.fragment.AlertDialogueFragment;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -22,12 +21,42 @@ import okhttp3.RequestBody;
 
 public class EmotionClassificationLogic {
     public String TAG = "ChatActivity";
+    public String chatUsername;
+
+    public EmotionClassificationLogic(String chatUsername){
+        this.chatUsername = chatUsername;
+    }
 
     public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, ImageView emotionImageView){
+        return this.getCommonMessagesToClassify(chatMessages, emotionImageView, 0);
+    }
+
+    /**
+    * modality: integer which represent which messages need to be taken into account for classification purposes
+     * if 0: Both Sender and Receiver
+     *    1: Only Sender
+     *    2: Only Receiver
+     */
+    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, ImageView emotionImageView, int modality){
         List<Message> messagesToClassify = new ArrayList<>();
+        List<Message> filteredMessages = new ArrayList<>();
         Log.i(TAG, "New message, total: " + chatMessages.size());
+
+        //Filtering
+        if(modality != 0){
+            for(Message m: chatMessages) {
+                if ((m.getSender_name().equals(chatUsername) && modality == 1) ||
+                        (!m.getSender_name().equals(chatUsername)) && modality == 2) {
+                    filteredMessages.add(m);
+                    Log.i(TAG, "Added " + m.getText());
+                }
+            }
+        } else {
+            filteredMessages = new ArrayList<>(chatMessages);
+        }
+
         //Rest Api Call
-        int message_size = chatMessages.size();
+        int message_size = filteredMessages.size();
         int fromIndex, lastIndex;
         int remainder = message_size % Constants.REST_API_MESSAGE_SIZE;
 
@@ -49,8 +78,8 @@ public class EmotionClassificationLogic {
         }
         return messagesToClassify;
     }
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void performMessageClassification(Context context, List<Message> messagesToClassify, UICallback callback){
+
+    public void performMessageClassification(Context context, List<Message> messagesToClassify, UICallback callback, int type){
 
         List<Message> audioList = new ArrayList<Message>();
         List<Message> textList = new ArrayList<Message>();
@@ -88,7 +117,7 @@ public class EmotionClassificationLogic {
                     .build());
         }
 
-        CustomAsyncTask asyncTask = new CustomAsyncTask(requests);
+        CustomAsyncTask asyncTask = new CustomAsyncTask(requests, type);
         asyncTask.setResponseCallbacks(callback);
         asyncTask.execute();
     }
