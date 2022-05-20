@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.chatapp.R;
 import com.example.chatapp.dto.Message;
-import com.example.chatapp.fragment.EmotionClassificationBySenderAlertDialogueFragment;
 import com.example.chatapp.util.EmotionClassificationLogic;
 import com.example.chatapp.util.EmotionProcessing;
 import com.example.chatapp.util.UICallback;
@@ -43,8 +42,10 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
         EmotionClassificationLogic emotionClassificationLogic = new EmotionClassificationLogic(displayName);
         List<Message> peerMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, peerImageView,2);
         List<Message> yourMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, yourImageView,1);
+        Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
+        Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
         if(peerMessages.size() > 0){
-            emotionClassificationLogic.performMessageClassification(getApplicationContext(), yourMessages, (UICallback) this, 2);
+            emotionClassificationLogic.performMessageClassification(getApplicationContext(), peerMessages, (UICallback) this, 2);
         }
 
         if(yourMessages.size() > 0){

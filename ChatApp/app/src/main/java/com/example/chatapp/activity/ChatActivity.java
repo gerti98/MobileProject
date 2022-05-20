@@ -18,12 +18,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.connection.FirebaseDbManager;
@@ -31,7 +29,6 @@ import com.example.chatapp.dto.Message;
 import com.example.chatapp.NotificationHandlerService;
 import com.example.chatapp.R;
 import com.example.chatapp.RecyclerItemClickListener;
-import com.example.chatapp.fragment.EmotionClassificationBySenderAlertDialogueFragment;
 import com.example.chatapp.util.EmotionProcessing;
 import com.example.chatapp.util.EmotionClassificationLogic;
 import com.example.chatapp.util.UICallback;
@@ -53,7 +50,6 @@ https://sendbird.com/developer/tutorials/android-chat-tutorial-building-a-messag
 https://www.youtube.com/watch?v=1mJv4XxWlu8&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=8
 */
 public class ChatActivity extends AppCompatActivity implements UICallback {
-    private EmotionClassificationBySenderAlertDialogueFragment alertDialogueFragment;
     private FirebaseUser currentUser;
     private List<Message> chatMessages;
     private String chatUserName;
@@ -90,8 +86,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         chatUserUid = i.getStringExtra("chat_user_uid");
         key_chat = establishKeychat(currentUser.getUid(), chatUserUid);
         chatMessages = new ArrayList<>();
-
-
 
         //UI init
         chatToolbar = findViewById(R.id.chat_toolbar);
