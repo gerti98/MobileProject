@@ -46,6 +46,7 @@ public class FirebaseDbManager {
     private boolean focusOnLast = true;
     int focusCounter;
     ChildEventListener chatsListener;
+    boolean askLabelling = true;
 
     final private String TAG = "ChatApp/DbManager";
 
@@ -98,7 +99,8 @@ public class FirebaseDbManager {
     }
 
     // initialize the listener to update the current chat UI
-    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat, int howManyMsgToShow, int increment){
+    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat,
+                                        int howManyMsgToShow, int increment){
         if(howManyMsgToShow!= Constants.DEFAULT_MSG_SHOWN)
             db.child(key_chat+"/messages").removeEventListener(chatsListener);
         focusCounter = 0;
@@ -111,6 +113,7 @@ public class FirebaseDbManager {
                     db.child(key_chat+"/messages").removeEventListener(this);
                 }
                 else {
+
                     Message result = dataSnapshot.getValue(Message.class);
                     messageList.add(result);
                     RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
@@ -123,8 +126,11 @@ public class FirebaseDbManager {
                         rv.scrollToPosition(messageList.size()-1);
                     else if(focusCounter == 0)
                         focusCounter++;
-                    else if(focusCounter == increment) // increment = 5 is the increment of message set in ChatActivity
+                    else if(focusCounter == increment) { // increment = 5 is the increment of message set in ChatActivity
                         focusOnLast = true;
+                        // New message so I have to set askLabelling to True
+                        askLabelling = true;
+                    }
 
                     // Download the audio message if it is an audio message
                     if (!result.getIsAudio())
@@ -160,6 +166,14 @@ public class FirebaseDbManager {
         //adding the listener to the chat
         db.child(key_chat+"/messages").limitToLast(howManyMsgToShow).addChildEventListener(chatsListener);
 
+    }
+
+    public boolean isAskLabelling() {
+        return askLabelling;
+    }
+
+    public void setAskLabelling(boolean askLabelling) {
+        this.askLabelling = askLabelling;
     }
 
     public void setFocusOnLast(boolean focusOnLast) {

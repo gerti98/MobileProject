@@ -31,7 +31,10 @@ public class LabelingFormActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_labeling_form);
-        ArrayList<Message> messageList = (ArrayList<Message>) getIntent().getSerializableExtra("messages");
+        Intent i = getIntent();
+        ArrayList<Message> messageList = (ArrayList<Message>) i.getSerializableExtra("messages");
+        String chatUsername = i.getStringExtra("username");
+        String chatUserId = i.getStringExtra("userid");
 
         RecyclerView recyclerView = findViewById(R.id.recycler_label);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -73,7 +76,10 @@ public class LabelingFormActivity extends AppCompatActivity {
                 Uri uri = new LocalFileManager().createFileFromString(jsonToSend, jsonFilename, getApplicationContext());
 
                 new FirebaseDbManager().uploadJSONLabel(uri, jsonFilename);
-                Intent intent = new Intent(getApplicationContext(), ContactsActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra("askLabelling", false);
+                intent.putExtra("chat_user_name", chatUsername);
+                intent.putExtra("chat_user_uid", chatUserId);
                 startActivity(intent);
             }
         }

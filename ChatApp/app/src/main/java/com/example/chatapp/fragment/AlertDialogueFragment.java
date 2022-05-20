@@ -18,11 +18,15 @@ import java.util.List;
 
 public class AlertDialogueFragment extends DialogFragment {
     Context applicationContext;
+    String chatUsername;
+    String chatUserId;
     ArrayList<Message> messages;
 
-    public AlertDialogueFragment(Context context, List<Message> messages){
+    public AlertDialogueFragment(Context context, List<Message> messages, String username, String userid){
         this.applicationContext = context;
         this.messages = new ArrayList<Message>(messages);
+        this.chatUserId = userid;
+        this.chatUsername = username;
     }
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -35,6 +39,8 @@ public class AlertDialogueFragment extends DialogFragment {
             public void onClick(DialogInterface dialog, int id) {
                 Intent intent = new Intent(applicationContext, LabelingFormActivity.class);
                 intent.putExtra("messages", messages);
+                intent.putExtra("username", chatUsername);
+                intent.putExtra("userid", chatUserId);
                 startActivity(intent);
             }
         });

@@ -10,6 +10,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -28,6 +29,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,41 +55,58 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String[] permissionToRequest = {
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.FOREGROUND_SERVICE,
+                Manifest.permission.ACCESS_NOTIFICATION_POLICY,
+                Manifest.permission.INTERNET
+        };
+
 
         // Check Permissions
-        if (ContextCompat.checkSelfPermission(
+       if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.RECORD_AUDIO) ==
                 PackageManager.PERMISSION_GRANTED) {
+           Log.w(TAG, " PERM> Audio permission granded");
             // You can use the API that requires the permission.
         } else {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    Manifest.permission.RECORD_AUDIO);
+            requestPermissionLauncher.launch(permissionToRequest);
         }
 
-        if (ContextCompat.checkSelfPermission(
+       if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.FOREGROUND_SERVICE) ==
                 PackageManager.PERMISSION_GRANTED) {
+           Log.w(TAG, " PERM> foregorund permission granded");
             // You can use the API that requires the permission.
         } else {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    Manifest.permission.FOREGROUND_SERVICE);
+           requestPermissionLauncher.launch(permissionToRequest);
         }
 
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) ==
                 PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, " PERM> notification permission granded");
             // You can use the API that requires the permission.
         } else {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY);
+            requestPermissionLauncher.launch(permissionToRequest);
         }
 
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.INTERNET) ==
+                PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, " PERM> internet permission granded");
+            // You can use the API that requires the permission.
+        } else {
+            // You can directly ask for the permission.
+            // The registered ActivityResultCallback gets the result of this request.
+            requestPermissionLauncher.launch(permissionToRequest);
+        }
 
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
@@ -99,13 +121,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                    // app.
-                } else {
-                    Toast.makeText(MainActivity.this, "Since you do not give the permission you will not be able to send audio recording", Toast.LENGTH_SHORT).show();
+    private ActivityResultLauncher<String[]> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), PermissionMap -> {
+                for (Map.Entry<String, Boolean> entry : PermissionMap.entrySet()) {
+                    Log.w(TAG, "AAAA" + entry.getKey()+ "  " + String.valueOf(entry.getValue()));
                 }
             });
 

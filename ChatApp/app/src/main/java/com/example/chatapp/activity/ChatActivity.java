@@ -97,6 +97,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         key_chat = establishKeychat(currentUser.getUid(), chatUserUid);
         chatMessages = new ArrayList<>();
 
+
+
         //UI init
         chatToolbar = findViewById(R.id.chat_toolbar);
         chatToolbar.setTitle(chatUserName);
@@ -108,6 +110,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         //Recycler
         howManyMsgToShow = 15;
         fdm_chat = new FirebaseDbManager("chats");
+        boolean askLabel = i.getBooleanExtra("askLabelling", true);
+        Log.w(TAG, "askLabel: " + String.valueOf(askLabel));
+        fdm_chat.setAskLabelling(askLabel);
 
         MessageRecycler = (RecyclerView) findViewById(R.id.recycler_gchat);
         layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -182,13 +187,14 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
                 //Check need of manual labelling
                 Log.w(TAG, "Focus on last is " + String.valueOf(fdm_chat.getFocusOnLast()));
-                if(fdm_chat.getFocusOnLast() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
+                Log.w(TAG, "ask labelling is " + String.valueOf(fdm_chat.isAskLabelling()));
+                if(fdm_chat.getFocusOnLast() && fdm_chat.isAskLabelling() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
                     Log.i(TAG, "Labelling request");
                     fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
                     lastIndex = message_size;
                     Log.i(TAG, "Created Labeling request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
                     List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
-                    AlertDialogueFragment dialog = new AlertDialogueFragment(getApplicationContext(), sublist);
+                    AlertDialogueFragment dialog = new AlertDialogueFragment(getApplicationContext(), sublist, chatUserName, chatUserUid);
                     dialog.show(getSupportFragmentManager(), "MyDialogFragmentTag");
                 }
             }
@@ -239,6 +245,13 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // Return to contacts and not to the labelling form
+        Intent intent = new Intent(getApplicationContext(), ContactsActivity.class);
+        startActivity(intent);
+    }
 
     // function to establish the unique key_chat identifier based on the user's uid of the chat
     public String establishKeychat(String uid1, String uid2){
