@@ -1,3 +1,20 @@
+From Batery-historian analysis of bugreport:
+Application                                 | com.example.chatapp
+Version Name                                | 1.0
+Version Code                                | 1
+UID                                         | 10394
+Device estimated power use                  | 0.01%
+Foreground                                  | 0 times over 5m 27s 870ms
+CPU user time                               | 9s 195ms
+CPU system time                             | 2s 804ms
+Device estimated power use due to CPU usage | 0.00%
+Total number of wakeup alarms               | 0
+Audio                                       | 1 times for a total duration of 1s 729ms
+
+
+
+
+From adb dumpsys:
 Battery History (0% used, 876 used of 4096KB, 10 strings using 536):
                     0 (14) RESET:TIME: 2022-05-21-11-13-52
                     0 (1) 100 status=discharging health=good plug=none temp=299 volt=4374 charge=3545 modemRailChargemAh=0 wifiRailChargemAh=0 +running +wake_lock +wifi_radio +screen phone_signal_strength=good +wifi wifi_signal_strength=3 wifi_suppl=completed +cellular_high_tx_power
