@@ -46,6 +46,10 @@ def predict_voice_emotion():
     features = extract_feature(file_name_wav, mfcc=True, chroma=True, mel=True)
     prediction = mlp_model.predict(features.reshape(1,-1))[0]
 
+    # To return the same emotions as text classifier, we assume that the class "happy" and "joy" are the same thing. 
+    if prediction == 'happy':
+        prediction = "joy"
+
     os.remove(file_name_to_convert)
     os.remove(file_name_wav)
 
