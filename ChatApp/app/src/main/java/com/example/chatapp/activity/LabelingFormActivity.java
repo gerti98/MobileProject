@@ -11,9 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.example.chatapp.RecyclerItemClickListener;
+import com.example.chatapp.listener.RecyclerItemClickListener;
 import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.R;
 import com.example.chatapp.adapter.LabelingAdapter;

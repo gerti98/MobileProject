@@ -15,10 +15,10 @@ import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.chatapp.adapter.ContactsAdapter;
-import com.example.chatapp.FavoritesHandler;
+import com.example.chatapp.favorites.FavoritesHandler;
 import com.example.chatapp.connection.FirebaseDbManager;
-import com.example.chatapp.firebaseevent.FirebaseEventHandler;
-import com.example.chatapp.NotificationHandlerService;
+import com.example.chatapp.firebasevent.FirebaseEventHandler;
+import com.example.chatapp.notification.NotificationHandlerService;
 import com.example.chatapp.R;
 import com.example.chatapp.dto.User;
 import com.google.firebase.auth.FirebaseAuth;

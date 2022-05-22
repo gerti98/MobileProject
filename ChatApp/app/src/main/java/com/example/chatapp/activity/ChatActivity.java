@@ -26,9 +26,9 @@ import android.widget.Toast;
 
 import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.dto.Message;
-import com.example.chatapp.NotificationHandlerService;
+import com.example.chatapp.notification.NotificationHandlerService;
 import com.example.chatapp.R;
-import com.example.chatapp.RecyclerItemClickListener;
+import com.example.chatapp.listener.RecyclerItemClickListener;
 import com.example.chatapp.util.EmotionProcessing;
 import com.example.chatapp.util.EmotionClassificationLogic;
 import com.example.chatapp.util.UICallback;

@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.favorites;
 
 import android.content.Context;
 import android.os.Environment;

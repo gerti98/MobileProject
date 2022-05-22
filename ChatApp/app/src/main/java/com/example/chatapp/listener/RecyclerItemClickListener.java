@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.listener;
 
 import android.content.Context;
 import android.view.GestureDetector;

@@ -1,4 +1,4 @@
-package com.example.chatapp.firebaseevent;
+package com.example.chatapp.firebasevent;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;

@@ -1,5 +1,6 @@
-package com.example.chatapp;
+package com.example.chatapp.notification;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,7 +14,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.chatapp.firebaseevent.FirebaseEventHandler;
+import com.example.chatapp.R;
+import com.example.chatapp.firebasevent.FirebaseEventHandler;
 import com.example.chatapp.activity.ChatActivity;
 import com.example.chatapp.connection.FirebaseDbManager;
 import com.example.chatapp.dto.NotificationMessageEntity;
@@ -26,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 public class NotificationHandlerService extends Service {
     private DatabaseReference dbNotificationsRef;
     private String activeUserChat = null;
+    private boolean isForeground = true;
     private ValueEventListener notificationsListener;
     private NotificationManager notificationManager;
 
@@ -44,6 +47,9 @@ public class NotificationHandlerService extends Service {
     public int onStartCommand(Intent intent,  int flags, int startId) {
         if (intent.hasExtra("user_active_chat")){
             activeUserChat = intent.getStringExtra("user_active_chat");
+        }
+        else if (intent.hasExtra("isForeground")){
+            isForeground = intent.getBooleanExtra("isForeground", true);
         }
         //START OF THE SERVICE
         else {
@@ -80,9 +86,9 @@ public class NotificationHandlerService extends Service {
                     //for each entry check if there are new messages from that sender and if the chat is no
                     if (!nEntity.isChecked()) {
 
-                        //if the notification is from the user of the active chat the application do not show it but
-                        //just update the status of the notification
-                        if(child.getKey().equals(activeUserChat)){
+                        //if the notification is from the user of the active chat and app is in foregroung,
+                        // the service does not show the notification but update its status on firebase db
+                        if(child.getKey().equals(activeUserChat) && isForeground){
                             new FirebaseDbManager("notifications").updateMessageNotificationEntity(FirebaseAuth.getInstance()
                             .getUid(), nEntity.getSender(), child.getKey(), true);
                             continue;
@@ -91,8 +97,18 @@ public class NotificationHandlerService extends Service {
                         Intent intent = new Intent(context, ChatActivity.class);
                         intent.putExtra("chat_user_name", nEntity.getSender());
                         intent.putExtra("chat_user_uid", child.getKey());
-                        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
-                                intent, 0);
+                        PendingIntent pendingIntent;
+
+                        //android S and over needs FLAG_MUTABLE for notification
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                            pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
+                            intent, PendingIntent.FLAG_MUTABLE);
+                        }
+                        else
+                        {
+                            pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
+                            intent, PendingIntent.FLAG_ONE_SHOT);
+                        }
 
                         //building a new notification
                         Notification.Builder notification = new Notification.Builder(context)

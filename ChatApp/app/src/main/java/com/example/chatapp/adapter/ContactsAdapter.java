@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.example.chatapp.R;
 import com.example.chatapp.activity.ChatActivity;
-import com.example.chatapp.FavoritesHandler;
+import com.example.chatapp.favorites.FavoritesHandler;
 import com.example.chatapp.dto.User;
 
 import java.util.ArrayList;

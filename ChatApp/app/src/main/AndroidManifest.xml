@@ -13,9 +13,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name=".listener.ActivityCallbacksListeners"
         android:theme="@style/Theme.ChatApp">
         <service
-            android:name=".NotificationHandlerService"
+            android:name=".notification.NotificationHandlerService"
             android:enabled="true"
             android:exported="true"></service>
 
