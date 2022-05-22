@@ -11,7 +11,16 @@ LOCAL_URL_VOICE = 'http://127.0.0.1:5000/predict_voice_emotion'
 
 TEST_FILE_PATH = "./UserLabels/"
 
-def test_text(url = LOCAL_URL_TEXT):
+def test_text(urltype = "local"):
+
+    if urltype == "local":
+        url = LOCAL_URL_TEXT
+    elif urltype == "heroku": 
+        url = HEROKU_URL_TEXT
+    else:
+        print("Inserted a wrong urltype, choose one between 'local' and 'heroku'")
+        exit()
+
     msgs = []
     users_labels = []
     model_labels = []
@@ -40,7 +49,16 @@ def test_text(url = LOCAL_URL_TEXT):
     
     return df
 
-def test_audio(url = LOCAL_URL_VOICE):
+def test_audio(urltype = "local"):
+
+    if urltype == "local":
+            url = LOCAL_URL_VOICE
+    elif urltype == "heroku": 
+        url = HEROKU_URL_VOICE
+    else:
+        print("Inserted a wrong urltype, choose one between 'local' and 'heroku'")
+        exit()
+
     audios = []
     users_labels = []
     model_labels = []
@@ -75,5 +93,16 @@ def test_audio(url = LOCAL_URL_VOICE):
             
 
 if __name__ == "__main__":
-    test_text()
-    test_audio()
+
+    urltype = "heroku"
+
+    df_text  = test_text(urltype)
+    df_audio = test_audio(urltype)
+   
+    print("\n------------------------------------------ TEXT ANALYSIS -----------------------------------------\n")
+    print(df_text.to_markdown())
+
+    print("\n")
+    
+    print("\n------------------------------------------ AUDIO ANALYSIS -----------------------------------------\n")
+    print(df_audio.to_markdown())
