@@ -120,9 +120,10 @@ public class FirebaseDbManager {
                      * 5 (i.e. increment = 5) then for the next 5 messages added the focus on the most recent message must not be done*/
                     if(focusOnLast)
                         rv.scrollToPosition(messageList.size()-1);
-                    else if(focusCounter == 0)
+                    else if(focusCounter < Constants.MSG_TO_SHOW_INCREMENT)
                         focusCounter++;
                     else if(focusCounter == Constants.MSG_TO_SHOW_INCREMENT) {
+                        focusCounter = 0;
                         focusOnLast = true;
                         // New message so I have to set askLabelling to True
                         askLabelling = true;
