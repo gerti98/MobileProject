@@ -44,11 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/*ideas:
-https://levelup.gitconnected.com/structure-firestore-firebase-for-scalable-chat-app-939c7a6cd0f5
-https://sendbird.com/developer/tutorials/android-chat-tutorial-building-a-messaging-ui
-https://www.youtube.com/watch?v=1mJv4XxWlu8&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=8
-*/
 public class ChatActivity extends AppCompatActivity implements UICallback {
     private FirebaseUser currentUser;
     private List<Message> chatMessages;

@@ -42,7 +42,9 @@ public class EmotionClassificationLogic {
         List<Message> filteredMessages = new ArrayList<>();
         Log.i(TAG, "New message, total: " + chatMessages.size());
 
-        //Filtering
+        // Filtering
+        // if the modality is 0 all messages are kept, otherwise they are filtered keeping the
+        // user ones (modality == 1) or the peer ones (modality == 2)
         if(modality != 0){
             for(Message m: chatMessages) {
                 if ((m.getSender_name().equals(chatUsername) && modality == 1) ||
