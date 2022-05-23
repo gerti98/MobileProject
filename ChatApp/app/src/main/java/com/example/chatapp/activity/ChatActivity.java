@@ -181,7 +181,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 int fromIndex, lastIndex;
 
                 EmotionClassificationLogic classificationLogic = new EmotionClassificationLogic(chatUserName);
-                List<Message> messagesToClassify = classificationLogic.getCommonMessagesToClassify(chatMessages, emotionImageView);
+                List<Message> messagesToClassify = classificationLogic.getCommonMessagesToClassify(chatMessages, (String) emotionImageView.getTag());
                 if(messagesToClassify.size() > 0){
                     classificationLogic.performMessageClassification(getApplicationContext(), messagesToClassify, (UICallback) thisActivity, 0);
                 }

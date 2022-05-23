@@ -37,8 +37,8 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
         yourImageView = findViewById(R.id.your_emotion_imageview);
 
         EmotionClassificationLogic emotionClassificationLogic = new EmotionClassificationLogic(displayName);
-        List<Message> peerMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, peerImageView,2);
-        List<Message> yourMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, yourImageView,1);
+        List<Message> peerMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, (String) peerImageView.getTag(),2);
+        List<Message> yourMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, (String) yourImageView.getTag(),1);
         Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
         Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
         if(peerMessages.size() > 0){

@@ -29,8 +29,8 @@ public class EmotionClassificationLogic {
         this.chatUsername = chatUsername;
     }
 
-    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, ImageView emotionImageView){
-        return this.getCommonMessagesToClassify(chatMessages, emotionImageView, 0);
+    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, String imageTag){
+        return this.getCommonMessagesToClassify(chatMessages, imageTag, 0);
     }
 
     /**
@@ -39,23 +39,9 @@ public class EmotionClassificationLogic {
      *    1: Only Sender
      *    2: Only Receiver
      */
-    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, ImageView emotionImageView, int modality){
+    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, String imageTag, int modality){
         List<Message> messagesToClassify = new ArrayList<>();
-        List<Message> filteredMessages = new ArrayList<>();
-        Log.i(TAG, "New message, total: " + chatMessages.size());
-
-        //Filtering
-        if(modality != 0){
-            for(Message m: chatMessages) {
-                if ((m.getSender_name().equals(chatUsername) && modality == 1) ||
-                        (!m.getSender_name().equals(chatUsername)) && modality == 2) {
-                    filteredMessages.add(m);
-                    Log.i(TAG, "Added " + m.getText());
-                }
-            }
-        } else {
-            filteredMessages = new ArrayList<>(chatMessages);
-        }
+        List<Message> filteredMessages = this.filterMessagesByModality(chatMessages, modality);
 
         //Rest Api Call
         int message_size = filteredMessages.size();
@@ -64,7 +50,7 @@ public class EmotionClassificationLogic {
 
         //If chat is loaded, then it needs to be classified in the last classification result
         if (message_size >= Constants.REST_API_MESSAGE_SIZE &&
-                emotionImageView.getTag().equals("wait")) {
+                imageTag.equals("wait")) {
             Log.i(TAG, "Need of reclassification for page refresh");
             fromIndex = message_size - remainder - Constants.REST_API_MESSAGE_SIZE;
             lastIndex = message_size - remainder;
@@ -85,7 +71,6 @@ public class EmotionClassificationLogic {
 
         List<Message> audioList = new ArrayList<Message>();
         List<Message> textList = new ArrayList<Message>();
-        List<Request> requests = new ArrayList<>();
 
         for(Message m: messagesToClassify){
             if(m.getIsAudio())
@@ -94,30 +79,7 @@ public class EmotionClassificationLogic {
                 textList.add(m);
         }
 
-        String json_text = JSONBuilder.buildMessageTextJSON(textList);
-        Log.i(TAG, "JSON to send:" + json_text);
-
-        if(!textList.isEmpty()){
-            requests.add(new Request.Builder()
-                    .url(Constants.URL_TEXT_MESSAGES_REST_API)
-                    .post(RequestBody.create(json_text, Constants.JSON_MEDIATYPE))
-                    .build());
-        }
-
-        for(Message m: audioList){
-            String receivedRecFilePath = context.getExternalCacheDir().getAbsolutePath();
-            receivedRecFilePath += m.getFilename();
-            File file = new File(receivedRecFilePath);
-
-            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("file", "file",
-                            RequestBody.create(file, MediaType.parse("audio/vnd.wave")))
-                    .build();
-            requests.add(new Request.Builder()
-                    .url(Constants.URL_VOICE_MESSAGES_REST_API)
-                    .post(requestBody)
-                    .build());
-        }
+        List<Request> requests = this.buildClassificationRequestList(audioList, textList, context);
 
         CustomAsyncTask asyncTask = new CustomAsyncTask(requests, type);
         asyncTask.setResponseCallbacks(callback);
@@ -158,5 +120,55 @@ public class EmotionClassificationLogic {
             emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
             emotionImageView.setTag("fear");
         }
+    }
+
+    private List<Message> filterMessagesByModality(List<Message> chatMessages, int modality){
+        List<Message> filteredMessages = new ArrayList<>();
+        Log.i(TAG, "New message, total: " + chatMessages.size());
+
+        //Filtering
+        if(modality != 0){
+            for(Message m: chatMessages) {
+                if ((m.getSender_name().equals(chatUsername) && modality == 1) ||
+                        (!m.getSender_name().equals(chatUsername)) && modality == 2) {
+                    filteredMessages.add(m);
+                    Log.i(TAG, "Added " + m.getText());
+                }
+            }
+        } else {
+            filteredMessages = new ArrayList<>(chatMessages);
+        }
+
+        return filteredMessages;
+    }
+
+    private List<Request> buildClassificationRequestList(List<Message> audioList, List<Message> textList, Context context){
+        List<Request> requests = new ArrayList<>();
+        String json_text = JSONBuilder.buildMessageTextJSON(textList);
+        Log.i(TAG, "JSON to send:" + json_text);
+
+        if(!textList.isEmpty()){
+            requests.add(new Request.Builder()
+                    .url(Constants.URL_TEXT_MESSAGES_REST_API)
+                    .post(RequestBody.create(json_text, Constants.JSON_MEDIATYPE))
+                    .build());
+        }
+
+        for(Message m: audioList){
+            String receivedRecFilePath = context.getExternalCacheDir().getAbsolutePath();
+            receivedRecFilePath += m.getFilename();
+            File file = new File(receivedRecFilePath);
+
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("file", "file",
+                            RequestBody.create(file, MediaType.parse("audio/vnd.wave")))
+                    .build();
+            requests.add(new Request.Builder()
+                    .url(Constants.URL_VOICE_MESSAGES_REST_API)
+                    .post(requestBody)
+                    .build());
+        }
+
+        return requests;
     }
 }
