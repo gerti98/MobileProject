@@ -25,7 +25,6 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
     ImageView peerImageView;
     ImageView yourImageView;
     String displayName;
-    String chatUserId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
