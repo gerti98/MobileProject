@@ -75,7 +75,6 @@ public class NotificationHandlerService extends Service {
 
     // track the new messages for the logged user
     public void trackNotificationMessages(){
-        NotificationHandlerService context = this;
         notificationsListener = new ValueEventListener() {
 
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -93,47 +92,11 @@ public class NotificationHandlerService extends Service {
                             .getUid(), nEntity.getSender(), child.getKey(), true);
                             continue;
                         }
-                        //define the pending intent to open the chat on click action
-                        Intent intent = new Intent(context, ChatActivity.class);
-                        intent.putExtra("chat_user_name", nEntity.getSender());
-                        intent.putExtra("chat_user_uid", child.getKey());
-                        PendingIntent pendingIntent;
 
-                        //android S and over needs FLAG_MUTABLE for notification
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                            pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
-                            intent, PendingIntent.FLAG_MUTABLE);
-                        }
-                        else
-                        {
-                            pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
-                            intent, PendingIntent.FLAG_ONE_SHOT);
-                        }
-
-                        //building a new notification
-                        Notification.Builder notification = new Notification.Builder(context)
-                                .setSmallIcon(R.drawable.ic_notification_icon)
-                                .setContentText("New Messages from " + nEntity.getSender())
-                                .setContentTitle("Chatapp")
-                                .setContentIntent(pendingIntent);
-
-                        //show the notification, SDK_INT >= Build.VERSION_CODES.O a NotificationChannel is required
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            //group all the message notification in the same channel
-                            String channelId = "Message Notification Channel";
-                            NotificationChannel channel = new NotificationChannel(
-                                    channelId,
-                                    "Chatapp Notifications",
-                                    NotificationManager.IMPORTANCE_HIGH);
-                            notificationManager.createNotificationChannel(channel);
-                            notification.setChannelId(channelId);
-                        }
-                        Notification built_notification = notification.build();
-                        //set auto-cancel after selecting
-                        built_notification.flags |= Notification.FLAG_AUTO_CANCEL;
                         //The group of notifications are distinguished by tags, if the key is the same the notification
                         //is just updated
-                        notificationManager.notify(child.getKey(), 0, built_notification);
+                        notificationManager.notify(child.getKey(), 0,
+                        buildMessageNotification(nEntity.getSender(),  child.getKey()));
 
                         //update checked field to true (notifications has been checked)
                         new FirebaseDbManager("notifications").updateMessageNotificationEntity(FirebaseAuth.getInstance()
@@ -152,8 +115,53 @@ public class NotificationHandlerService extends Service {
         /*dbNotificationsRef.addValueEventListener(notificationsListener);*/
     }
 
-    public void cancelAllNotification(){
-        notificationManager.cancelAll();
+    private Notification buildMessageNotification(String sender, String receiver){
+        NotificationHandlerService context = this;
+        //define the pending intent to open the chat when clicking notification
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra("chat_user_name", sender);
+        intent.putExtra("chat_user_uid", receiver);
+        PendingIntent pendingIntent;
+
+        //android S and over needs FLAG_MUTABLE for notification
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
+                    intent, PendingIntent.FLAG_MUTABLE);
+        }
+        else
+        {
+            pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
+                    intent, PendingIntent.FLAG_ONE_SHOT);
+        }
+
+        //building a new notification
+        Notification.Builder notification = new Notification.Builder(context)
+                .setSmallIcon(R.drawable.ic_notification_icon)
+                .setContentText("New Messages from " + sender)
+                .setContentTitle("Chatapp")
+                .setContentIntent(pendingIntent);
+
+        //show the notification, SDK_INT >= Build.VERSION_CODES.O a NotificationChannel is required
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //group all the message notification in the same channel
+            String channelId = "Message Notification Channel";
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Chatapp Notifications",
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+            notification.setChannelId(channelId);
+        }
+        Notification built_notification = notification.build();
+        //set auto-cancel after selecting
+        built_notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        return built_notification;
+    }
+
+    private void cancelAllNotification(){
+        if (notificationManager != null) {
+            notificationManager.cancelAll();
+        }
     }
 
 }
