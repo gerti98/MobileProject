@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:paddingTop="20dp"
             android:text="Emotion Detection by Sender"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -126,12 +127,14 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="5dp"
                 app:cardBackgroundColor="#5E5B5B">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_margin="5dp"
                     android:gravity="center_horizontal|center_vertical"
                     android:orientation="vertical">
 
@@ -141,7 +144,8 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:text="Legenda"
-                        android:textSize="24sp" />
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -161,6 +165,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:gravity="center_horizontal"
                             android:text="Neutral"
                             android:textSize="20sp" />
                     </LinearLayout>
@@ -183,6 +188,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:gravity="center_horizontal"
                             android:text="Sadness"
                             android:textSize="20sp" />
                     </LinearLayout>
@@ -205,6 +211,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:gravity="center_horizontal"
                             android:text="Joy"
                             android:textSize="20sp" />
                     </LinearLayout>
@@ -227,6 +234,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:gravity="center_horizontal"
                             android:text="Fear"
                             android:textSize="20sp" />
                     </LinearLayout>
@@ -249,6 +257,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:gravity="center_horizontal"
                             android:text="Anger"
                             android:textSize="20sp" />
                     </LinearLayout>

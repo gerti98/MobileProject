@@ -208,6 +208,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 //Check need of manual labelling
                 Log.w(TAG, "Focus on last is " + String.valueOf(fdm_chat.getFocusOnLast()));
                 Log.w(TAG, "ask labelling is " + String.valueOf(fdm_chat.isAskLabelling()));
+                Log.w(TAG, "Message size " + message_size);
+
                 if(fdm_chat.getFocusOnLast() && fdm_chat.isAskLabelling() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
                     Log.i(TAG, "Labelling request");
                     fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;

@@ -35,5 +35,6 @@ Group Meeting: Discussion about App finalization. Setting up of experiment to be
 
 Performing manual labeling activity by sending messages (text and audio) to people on the app and labeling it.
 Searching for candidates to join for experiment purposes.
+Preparing guide for candidates to perform labeling of messages.
 
 
