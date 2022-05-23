@@ -94,6 +94,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         sendRecBtn = findViewById(R.id.send_rec_btn);
         editTextMsg = findViewById(R.id.edit_text_message);
         emotionImageView = findViewById(R.id.emotion_imageview);
+
+        //If Emoji is pressed new info about Emotion per sender are shown
         emotionImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +107,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         });
 
         //Recycler
-        howManyMsgToShow = 15;
+        howManyMsgToShow = Constants.DEFAULT_MSG_SHOWN;
         fdm_chat = new FirebaseDbManager("chats");
         boolean askLabel = i.getBooleanExtra("askLabelling", true);
         Log.w(TAG, "askLabel: " + String.valueOf(askLabel));
@@ -114,6 +116,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         MessageRecycler = (RecyclerView) findViewById(R.id.recycler_gchat);
         layoutManager = new LinearLayoutManager(getApplicationContext());
         MessageRecycler.setLayoutManager(layoutManager);
+
+        //Add possibility to listen to an audio by tapping the related message
         MessageRecycler.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, MessageRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
@@ -294,45 +298,20 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
 
     @Override
-    public void onFailure(String response) {
+    public void onClassificationFailure(String response) {
         Log.i(TAG, "Response: " + response);
     }
 
     /**
+     * Obtain results from Rest API and process it
      * @param type: 0 if chat emoji, 1 if your emoji, 2 if peer emoji
      */
     @Override
-    public void onSuccess(List<String> responses, int type) {
-        List<String> mergedResult = new ArrayList<>();
-        List<String> result;
-        for(String response: responses) {
-            if(!response.contains("[")){
-                String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
-                mergedResult.add(cleanResponse);
-            } else {
-                result = new Gson().fromJson(response, List.class);
-                mergedResult.addAll(result);
-            }
-        }
+    public void onClassificationSuccess(List<String> responses, int type) {
+        List<String> mergedResult = EmotionClassificationLogic.mergeResultsFromDifferentSources(responses);
         Log.i(TAG, "Response len: " + mergedResult.size());
         String winner = EmotionProcessing.getEmotionClassMajority(mergedResult);
-        if (winner.equals("joy")) {
-            Log.i(TAG, "Joy change");
-            emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
-            emotionImageView.setTag("joy");
-        } else if(winner.equals("neutral")) {
-            emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
-            emotionImageView.setTag("neutral");
-        } else if(winner.equals("sadness")) {
-            emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
-            emotionImageView.setTag("sadness");
-        } else if(winner.equals("fear")) {
-            emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
-            emotionImageView.setTag("fear");
-        } else if(winner.equals("anger")) {
-            emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
-            emotionImageView.setTag("fear");
-        }
+        EmotionClassificationLogic.setImageViewEmoji(winner, emotionImageView);
     }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =

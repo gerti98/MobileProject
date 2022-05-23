@@ -7,7 +7,9 @@ import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.chatapp.R;
 import com.example.chatapp.dto.Message;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class EmotionClassificationLogic {
-    public String TAG = "ChatActivity";
+    public static String TAG = "ChatActivity";
     public String chatUsername;
 
     public EmotionClassificationLogic(String chatUsername){
@@ -120,5 +122,41 @@ public class EmotionClassificationLogic {
         CustomAsyncTask asyncTask = new CustomAsyncTask(requests, type);
         asyncTask.setResponseCallbacks(callback);
         asyncTask.execute();
+    }
+
+    public static List<String> mergeResultsFromDifferentSources(List<String> responses){
+        List<String> mergedResult = new ArrayList<>();
+        List<String> result;
+        for(String response: responses) {
+            if(!response.contains("[")){
+                String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
+                mergedResult.add(cleanResponse);
+            } else {
+                result = new Gson().fromJson(response, List.class);
+                mergedResult.addAll(result);
+            }
+        }
+
+        return mergedResult;
+
+    }
+    public static void setImageViewEmoji(String winnerEmotion, ImageView emotionImageView){
+        if (winnerEmotion.equals("joy")) {
+            Log.i(TAG, "Joy change");
+            emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
+            emotionImageView.setTag("joy");
+        } else if(winnerEmotion.equals("neutral")) {
+            emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
+            emotionImageView.setTag("neutral");
+        } else if(winnerEmotion.equals("sadness")) {
+            emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
+            emotionImageView.setTag("sadness");
+        } else if(winnerEmotion.equals("fear")) {
+            emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
+            emotionImageView.setTag("fear");
+        } else if(winnerEmotion.equals("anger")) {
+            emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
+            emotionImageView.setTag("fear");
+        }
     }
 }
