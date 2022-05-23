@@ -30,6 +30,7 @@ Group Meeting: Discussion about possible solution for implementing emotion detec
 
 16/05/2022
 Meeting with Lorenzo Massagli: Discussion about the voice detection implementation. In particular we have discussed how the app and server communicates and which is the audio format required by the classifier.
+Look for a way to convert messages from .aac to .wav, at the end we have decided to register the audio messages directly in wav, in any case a conversion is necessary because the classifier requires a specific wav encoding.
 
 
 17/05/2022
@@ -38,3 +39,21 @@ Group Meeting: Discussion regarding deploying problems due to Heroku slug size l
 
 18/05/2022
 Researched and read material and documentation in order to implement the dynamic load of messages when the user scrolls
+
+
+20/05/2022
+Meeting: discussion about the functionalities developed so far and about the possible functionalities to add. Discussion about the testing phase regarding which test will be performed and how they will be performed (statistics about power consumption and labelling).
+Research of testers for testing the application and use the labelling.
+Updated the documentation
+Studied a way to request labelling only once and to request multiple permissions.
+Bug found with tester and resolved along with the other team members.
+
+
+21/05/2022
+Used adb for collecting power consumption information concerning the developed app, setup battery-historian and used to retrieve graphic information from adb output.
+Create a representation of the system for the documentation.
+
+
+23/05/2022
+Collaborate to database cleanup. Search for testers.
+
