@@ -7,7 +7,9 @@ import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.chatapp.R;
 import com.example.chatapp.dto.Message;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,15 +22,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class EmotionClassificationLogic {
-    public String TAG = "ChatActivity";
+    public static String TAG = "ChatActivity";
     public String chatUsername;
 
     public EmotionClassificationLogic(String chatUsername){
         this.chatUsername = chatUsername;
     }
 
-    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, ImageView emotionImageView){
-        return this.getCommonMessagesToClassify(chatMessages, emotionImageView, 0);
+    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, String imageTag){
+        return this.getCommonMessagesToClassify(chatMessages, imageTag, 0);
     }
 
     /**
@@ -37,25 +39,9 @@ public class EmotionClassificationLogic {
      *    1: Only Sender
      *    2: Only Receiver
      */
-    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, ImageView emotionImageView, int modality){
+    public List<Message> getCommonMessagesToClassify(List<Message> chatMessages, String imageTag, int modality){
         List<Message> messagesToClassify = new ArrayList<>();
-        List<Message> filteredMessages = new ArrayList<>();
-        Log.i(TAG, "New message, total: " + chatMessages.size());
-
-        // Filtering
-        // if the modality is 0 all messages are kept, otherwise they are filtered keeping the
-        // user ones (modality == 1) or the peer ones (modality == 2)
-        if(modality != 0){
-            for(Message m: chatMessages) {
-                if ((m.getSender_name().equals(chatUsername) && modality == 1) ||
-                        (!m.getSender_name().equals(chatUsername)) && modality == 2) {
-                    filteredMessages.add(m);
-                    Log.i(TAG, "Added " + m.getText());
-                }
-            }
-        } else {
-            filteredMessages = new ArrayList<>(chatMessages);
-        }
+        List<Message> filteredMessages = this.filterMessagesByModality(chatMessages, modality);
 
         //Rest Api Call
         int message_size = filteredMessages.size();
@@ -64,7 +50,7 @@ public class EmotionClassificationLogic {
 
         //If chat is loaded, then it needs to be classified in the last classification result
         if (message_size >= Constants.REST_API_MESSAGE_SIZE &&
-                emotionImageView.getTag().equals("wait")) {
+                imageTag.equals("wait")) {
             Log.i(TAG, "Need of reclassification for page refresh");
             fromIndex = message_size - remainder - Constants.REST_API_MESSAGE_SIZE;
             lastIndex = message_size - remainder;
@@ -85,7 +71,6 @@ public class EmotionClassificationLogic {
 
         List<Message> audioList = new ArrayList<Message>();
         List<Message> textList = new ArrayList<Message>();
-        List<Request> requests = new ArrayList<>();
 
         for(Message m: messagesToClassify){
             if(m.getIsAudio())
@@ -94,6 +79,71 @@ public class EmotionClassificationLogic {
                 textList.add(m);
         }
 
+        List<Request> requests = this.buildClassificationRequestList(audioList, textList, context);
+
+        CustomAsyncTask asyncTask = new CustomAsyncTask(requests, type);
+        asyncTask.setResponseCallbacks(callback);
+        asyncTask.execute();
+    }
+
+    public static List<String> mergeResultsFromDifferentSources(List<String> responses){
+        List<String> mergedResult = new ArrayList<>();
+        List<String> result;
+        for(String response: responses) {
+            if(!response.contains("[")){
+                String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
+                mergedResult.add(cleanResponse);
+            } else {
+                result = new Gson().fromJson(response, List.class);
+                mergedResult.addAll(result);
+            }
+        }
+
+        return mergedResult;
+
+    }
+    public static void setImageViewEmoji(String winnerEmotion, ImageView emotionImageView){
+        if (winnerEmotion.equals("joy")) {
+            Log.i(TAG, "Joy change");
+            emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
+            emotionImageView.setTag("joy");
+        } else if(winnerEmotion.equals("neutral")) {
+            emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
+            emotionImageView.setTag("neutral");
+        } else if(winnerEmotion.equals("sadness")) {
+            emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
+            emotionImageView.setTag("sadness");
+        } else if(winnerEmotion.equals("fear")) {
+            emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
+            emotionImageView.setTag("fear");
+        } else if(winnerEmotion.equals("anger")) {
+            emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
+            emotionImageView.setTag("fear");
+        }
+    }
+
+    private List<Message> filterMessagesByModality(List<Message> chatMessages, int modality){
+        List<Message> filteredMessages = new ArrayList<>();
+        Log.i(TAG, "New message, total: " + chatMessages.size());
+
+        //Filtering
+        if(modality != 0){
+            for(Message m: chatMessages) {
+                if ((m.getSender_name().equals(chatUsername) && modality == 1) ||
+                        (!m.getSender_name().equals(chatUsername)) && modality == 2) {
+                    filteredMessages.add(m);
+                    Log.i(TAG, "Added " + m.getText());
+                }
+            }
+        } else {
+            filteredMessages = new ArrayList<>(chatMessages);
+        }
+
+        return filteredMessages;
+    }
+
+    private List<Request> buildClassificationRequestList(List<Message> audioList, List<Message> textList, Context context){
+        List<Request> requests = new ArrayList<>();
         String json_text = JSONBuilder.buildMessageTextJSON(textList);
         Log.i(TAG, "JSON to send:" + json_text);
 
@@ -119,8 +169,6 @@ public class EmotionClassificationLogic {
                     .build());
         }
 
-        CustomAsyncTask asyncTask = new CustomAsyncTask(requests, type);
-        asyncTask.setResponseCallbacks(callback);
-        asyncTask.execute();
+        return requests;
     }
 }

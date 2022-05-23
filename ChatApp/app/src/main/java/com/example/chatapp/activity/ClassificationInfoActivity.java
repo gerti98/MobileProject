@@ -25,7 +25,6 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
     ImageView peerImageView;
     ImageView yourImageView;
     String displayName;
-    String chatUserId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,14 +33,12 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
         Intent i = getIntent();
         chatMessages = (ArrayList<Message>) i.getSerializableExtra("messages");
         displayName = i.getStringExtra("displayName");
-//        chatUserId = i.getStringExtra("userid");
-
         peerImageView = findViewById(R.id.peer_emotion_imageview);
         yourImageView = findViewById(R.id.your_emotion_imageview);
 
         EmotionClassificationLogic emotionClassificationLogic = new EmotionClassificationLogic(displayName);
-        List<Message> peerMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, peerImageView,2);
-        List<Message> yourMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, yourImageView,1);
+        List<Message> peerMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, (String) peerImageView.getTag(),2);
+        List<Message> yourMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, (String) yourImageView.getTag(),1);
         Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
         Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
         if(peerMessages.size() > 0){
@@ -54,7 +51,7 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
     }
 
     @Override
-    public void onFailure(String response) {
+    public void onClassificationFailure(String response) {
 
     }
 
@@ -62,18 +59,8 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
      * @param type: 0 if chat emoji, 1 if your emoji, 2 if peer emoji
      */
     @Override
-    public void onSuccess(List<String> responses, int type) throws IOException {
-        List<String> mergedResult = new ArrayList<>();
-        List<String> result;
-        for(String response: responses) {
-            if(!response.contains("[")){
-                String cleanResponse = response.replaceAll("^\"|\"$", "").replace("\n", "").replace("\r", "");
-                mergedResult.add(cleanResponse);
-            } else {
-                result = new Gson().fromJson(response, List.class);
-                mergedResult.addAll(result);
-            }
-        }
+    public void onClassificationSuccess(List<String> responses, int type) throws IOException {
+        List<String> mergedResult = EmotionClassificationLogic.mergeResultsFromDifferentSources(responses);
 
         ImageView emotionImageView;
         if(type == 1){
@@ -86,22 +73,6 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
 
         Log.i(TAG, "Response len: " + mergedResult.size());
         String winner = EmotionProcessing.getEmotionClassMajority(mergedResult);
-        if (winner.equals("joy")) {
-            Log.i(TAG, "Joy change");
-            emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
-            emotionImageView.setTag("joy");
-        } else if(winner.equals("neutral")) {
-            emotionImageView.setImageResource(R.drawable.ic_neutral_emoji);
-            emotionImageView.setTag("neutral");
-        } else if(winner.equals("sadness")) {
-            emotionImageView.setImageResource(R.drawable.ic_sad_emoji);
-            emotionImageView.setTag("sadness");
-        } else if(winner.equals("fear")) {
-            emotionImageView.setImageResource(R.drawable.ic_fear_emoji);
-            emotionImageView.setTag("fear");
-        } else if(winner.equals("anger")) {
-            emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
-            emotionImageView.setTag("fear");
-        }
+        EmotionClassificationLogic.setImageViewEmoji(winner, emotionImageView);
     }
 }

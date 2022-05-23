@@ -2,7 +2,6 @@ package com.example.chatapp.util;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,9 +55,9 @@ public class CustomAsyncTask extends AsyncTask {
         Log.i(TAG, "[HTTP request onPostExecute]");
         try {
             if(results_string.isEmpty())
-                responseCallbacks.onFailure(null);
+                responseCallbacks.onClassificationFailure(null);
             else
-                responseCallbacks.onSuccess(results_string, type);
+                responseCallbacks.onClassificationSuccess(results_string, type);
         } catch (IOException e) {
             e.printStackTrace();
         }

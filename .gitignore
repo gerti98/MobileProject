@@ -3,4 +3,4 @@ ChatApp/.idea
 *.csv
 .DS_Store
 *.pyc
-
+*-checkpoint.ipynb

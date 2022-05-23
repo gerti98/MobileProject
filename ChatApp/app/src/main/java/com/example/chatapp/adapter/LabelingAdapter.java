@@ -46,7 +46,6 @@ public class LabelingAdapter extends RecyclerView.Adapter{
         return messageAndLabels;
     }
 
-
     // Determine the type of the message: sent or received
     @Override
     public int getItemViewType(int position) {
@@ -65,10 +64,7 @@ public class LabelingAdapter extends RecyclerView.Adapter{
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-
         Log.i(TAG, "onCreateViewHolder");
-
-
         if (viewType == AUDIO_MESSAGE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_labeling_item, parent, false);
             return new AudioMessage(view);
