@@ -37,7 +37,6 @@ import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.WavRecorder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.gson.Gson;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -66,6 +65,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private AppCompatActivity thisActivity = this;
     private boolean isRecording = false;
     private boolean stop;
+    private boolean askLabelling;
 
     //TODO: move constants into a better place
 
@@ -79,6 +79,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         Intent i = getIntent();
         chatUserName = i.getStringExtra("chat_user_name");
         chatUserUid = i.getStringExtra("chat_user_uid");
+        askLabelling = i.getBooleanExtra("askLabelling", true);
         key_chat = establishKeychat(currentUser.getUid(), chatUserUid);
         chatMessages = new ArrayList<>();
 
@@ -90,7 +91,22 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         editTextMsg = findViewById(R.id.edit_text_message);
         emotionImageView = findViewById(R.id.emotion_imageview);
 
-        //If Emoji is pressed new info about Emotion per sender are shown
+        addEmotionImageViewListener();
+        setMessageRecycler();
+
+        //tell the notification handler to not show notification of the active user when app is in
+        //foreground
+        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
+        intent.putExtra("user_active_chat", chatUserUid);
+        startService(intent);
+
+        //initialize the listener for the messages
+        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow);
+        setChatButtons();
+    }
+
+    //If Emoji is pressed new info about Emotion per sender are shown
+    private void addEmotionImageViewListener(){
         emotionImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,11 +116,13 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 startActivity(intent);
             }
         });
+    }
 
-        //Recycler
+    //set message recycler parameters and initialize listeners
+    private void setMessageRecycler(){
         howManyMsgToShow = Constants.DEFAULT_MSG_SHOWN;
         fdm_chat = new FirebaseDbManager("chats");
-        boolean askLabel = i.getBooleanExtra("askLabelling", true);
+        boolean askLabel = askLabelling;
         Log.w(TAG, "askLabel: " + String.valueOf(askLabel));
         fdm_chat.setAskLabelling(askLabel);
 
@@ -112,7 +130,13 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         layoutManager = new LinearLayoutManager(getApplicationContext());
         MessageRecycler.setLayoutManager(layoutManager);
 
-        //Add possibility to listen to an audio by tapping the related message
+        setMessageRecyclerTouchListener();
+        setMessageRecyclerScrollListener();
+        setMessageRecyclerLayoutChangeListener();
+    }
+
+    //Add possibility to listen to an audio by tapping the related message
+    private void setMessageRecyclerTouchListener(){
         MessageRecycler.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, MessageRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
@@ -130,6 +154,10 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     }
                 })
         );
+    }
+
+    //set on scroll load message event for the recycler
+    private void setMessageRecyclerScrollListener(){
         stop = false;
         MessageRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -160,14 +188,10 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 }
             }
         });
+    }
 
-
-        //tell the notification handler to not show notification of the active user on the chat
-        Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
-        intent.putExtra("user_active_chat", chatUserUid);
-        startService(intent);
-
-        //Handles the logic for sending messages to the model for emotion detection
+    //Handles the logic for sending messages to the model for emotion detection
+    private void setMessageRecyclerLayoutChangeListener(){
         MessageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @SuppressLint("NewApi")
             @Override
@@ -195,51 +219,44 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 }
             }
         });
+    }
 
-
-        //initialize the listener for the messages
-        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow);
-
+    private void setChatButtons(){
         //a message is added to the database
-        sendMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String msg = editTextMsg.getText().toString();
-                if (!msg.equals("")){
-                    editTextMsg.setText("");
-                    new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(), chatUserName, chatUserUid, msg);
-                }
+        sendMsgBtn.setOnClickListener(v -> {
+            String msg = editTextMsg.getText().toString();
+            if (!msg.equals("")){
+                editTextMsg.setText("");
+                new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(), chatUserName, chatUserUid, msg);
             }
         });
 
         // Registration button utils and listener
         Log.w(TAG, "File path:" + recFilePath);
 
-        sendRecBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isRecording){
-                    isRecording = false;
-                    Drawable onlineMic = getResources().getDrawable(R.drawable.mic_avail2);
-                    sendRecBtn.setBackground(onlineMic);
-                    stopRecording();
-                }
-                else {
-                    // Path to save rec
-                    recFilePath = getExternalCacheDir().getAbsolutePath();
-                    Long tsLong = System.currentTimeMillis()/1000;
-                    String ts = tsLong.toString();
-                    audioFilename = "/audio" + ts + ".wav";
-                    recFilePath += audioFilename;
+        sendRecBtn.setOnClickListener(v -> {
+            if(isRecording){
+                isRecording = false;
+                Drawable onlineMic = getResources().getDrawable(R.drawable.mic_avail2);
+                sendRecBtn.setBackground(onlineMic);
+                stopRecording();
+            }
+            else {
+                // Path to save rec
+                recFilePath = getExternalCacheDir().getAbsolutePath();
+                Long tsLong = System.currentTimeMillis()/1000;
+                String ts = tsLong.toString();
+                audioFilename = "/audio" + ts + ".wav";
+                recFilePath += audioFilename;
 
-                    isRecording = true;
-                    Drawable busyMic = getResources().getDrawable(R.drawable.mic_busy);
-                    sendRecBtn.setBackground(busyMic);
-                    startRecording();
-                }
+                isRecording = true;
+                Drawable busyMic = getResources().getDrawable(R.drawable.mic_busy);
+                sendRecBtn.setBackground(busyMic);
+                startRecording();
             }
         });
     }
+
 
     @Override
     public void onBackPressed() {

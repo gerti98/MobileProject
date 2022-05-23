@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -28,30 +27,40 @@ import java.util.ArrayList;
 
 public class ContactsActivity extends AppCompatActivity {
     private ArrayList<User> contacts;
-    final private AppCompatActivity thisActivity = this;
-    final private String TAG = "ChatApp/Contacts";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_contacts);
 
-        // Check Permission
-        if (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.RECORD_AUDIO) ==
-                PackageManager.PERMISSION_GRANTED) {
-            // You can use the API that requires the permission.
-        } else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    Manifest.permission.RECORD_AUDIO);
-        }
+        checkPermissions();
 
         //Start notification service for the authenticated user
         Intent intent = new Intent (getApplicationContext(), NotificationHandlerService.class);
         startService(intent);
 
-        setContentView(R.layout.activity_contacts);
+        //GUI
+        contacts = new ArrayList<>();
+        setLogoutButton();
+        setSearchBox();
+
+        //load favorites from file
+        FavoritesHandler.loadUserFavorites(getApplicationContext());
+        resetFavorites();
+    }
+
+    private void checkPermissions(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED) {
+                // You can use the API that requires the permission.
+        } else {
+            // You can directly ask for the permission.
+            // The registered ActivityResultCallback gets the result of this request.
+            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+        }
+    }
+
+    private void setLogoutButton(){
         findViewById(R.id.logout_button).setOnClickListener(view -> {
             FirebaseAuth.getInstance().signOut();
 
@@ -70,15 +79,12 @@ public class ContactsActivity extends AppCompatActivity {
             Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent1);
         });
+    }
 
-        contacts = new ArrayList<>();
-
-        //GUI
-
-        //search_box event definition, the search is by email
+    //search_box event definition, the search is by email
+    private void setSearchBox(){
         SearchView search_box = findViewById(R.id.search_box);
         AppCompatActivity contextActivity = this;
-        Context context = getApplicationContext();
         search_box.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -93,16 +99,12 @@ public class ContactsActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        //load favorites from file
-        FavoritesHandler.loadUserFavorites(getApplicationContext());
-        resetFavorites();
     }
 
     @Override
+    //when the activity stops the favorites are saved to the file
     public void onStop(){
         super.onStop();
-        //when the activity stops the favorites are saved to the file
         FavoritesHandler.saveUserFavorites(getApplicationContext());
         if (FirebaseAuth.getInstance().getUid() == null) {
             FavoritesHandler.clearFavoritesFromMemory();
