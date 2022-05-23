@@ -99,46 +99,39 @@ public class FirebaseDbManager {
     }
 
     // initialize the listener to update the current chat UI
-    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat,
-                                        int howManyMsgToShow, int increment){
+    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat, int howManyMsgToShow){
         if(howManyMsgToShow!= Constants.DEFAULT_MSG_SHOWN)
             db.child(key_chat+"/messages").removeEventListener(chatsListener);
         focusCounter = 0;
         chatsListener = new ChildEventListener() {
-
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-                //if no users are logged in I remove the listener
+                // If no users are logged in I remove the listener
                 if (FirebaseAuth.getInstance().getCurrentUser() == null){
                     db.child(key_chat+"/messages").removeEventListener(this);
                 }
                 else {
-
                     Message result = dataSnapshot.getValue(Message.class);
                     messageList.add(result);
                     RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
                     rv.setAdapter(new MessageAdapter(usersActivity, messageList));
 
-                    Log.w(TAG, "Focus on last is " + String.valueOf(focusOnLast));
-                    /* If focusOnLast is false this means that old messages are loaded, since the load messagges are
-                     * 5 (i.e. increment = 5) then for the next 5 messagges added the focus on the most recent message must not be done*/
+                    /* If focusOnLast is false this means that old messages are loaded, since the load messages are
+                     * 5 (i.e. increment = 5) then for the next 5 messages added the focus on the most recent message must not be done*/
                     if(focusOnLast)
                         rv.scrollToPosition(messageList.size()-1);
                     else if(focusCounter == 0)
                         focusCounter++;
-                    else if(focusCounter == increment) { // increment = 5 is the increment of message set in ChatActivity
+                    else if(focusCounter == Constants.MSG_TO_SHOW_INCREMENT) {
                         focusOnLast = true;
                         // New message so I have to set askLabelling to True
                         askLabelling = true;
                     }
-
                     // Download the audio message if it is an audio message
                     if (!result.getIsAudio())
                         return;
-
                     String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
                     receivedRecFilePath += result.getFilename();
-
                     File newFile = new File(receivedRecFilePath);
                     if (!newFile.exists())
                         new FirebaseDbManager().downloadAudio(result.getFilename(), receivedRecFilePath, usersActivity);
@@ -163,9 +156,8 @@ public class FirebaseDbManager {
             }
 
         };
-        //adding the listener to the chat
+        // Adding the listener to the chat
         db.child(key_chat+"/messages").limitToLast(howManyMsgToShow).addChildEventListener(chatsListener);
-
     }
 
     public boolean isAskLabelling() {

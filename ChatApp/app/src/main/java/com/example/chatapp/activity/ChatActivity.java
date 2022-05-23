@@ -105,7 +105,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         });
 
         //Recycler
-        howManyMsgToShow = 15;
+        howManyMsgToShow = Constants.DEFAULT_MSG_SHOWN;
         fdm_chat = new FirebaseDbManager("chats");
         boolean askLabel = i.getBooleanExtra("askLabelling", true);
         Log.w(TAG, "askLabel: " + String.valueOf(askLabel));
@@ -155,7 +155,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     chatMessages.clear();
                     howManyMsgToShow += Constants.MSG_TO_SHOW_INCREMENT;
                     fdm_chat.setFocusOnLast(false);
-                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat, howManyMsgToShow, Constants.MSG_TO_SHOW_INCREMENT);
+                    fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat, howManyMsgToShow);
                     //if(howManyMsgToShow>chatMessages.size())
                     stop = true;
                 }
@@ -199,7 +199,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
 
         //initialize the listener for the messages
-        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow, Constants.MSG_TO_SHOW_INCREMENT);
+        fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow);
 
         //a message is added to the database
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
