@@ -32,8 +32,7 @@ public class NotificationHandlerService extends Service {
     private ValueEventListener notificationsListener;
     private NotificationManager notificationManager;
 
-    public NotificationHandlerService() {
-    }
+    public NotificationHandlerService(){}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -112,7 +111,6 @@ public class NotificationHandlerService extends Service {
 
         };
         FirebaseEventHandler.addValueEvent(dbNotificationsRef, notificationsListener);
-        /*dbNotificationsRef.addValueEventListener(notificationsListener);*/
     }
 
     private Notification buildMessageNotification(String sender, String receiver){

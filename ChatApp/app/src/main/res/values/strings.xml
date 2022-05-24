@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ChatApp</string>
+    <string name="app_name">FeelChat</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="login_button">Login with Google</string>
     <string name="web_client_id">929176907328-hmuulsee3pe238egibflk6f0hutsn78v.apps.googleusercontent.com</string>
