@@ -102,6 +102,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
         //initialize the listener for the messages
         fdm_chat.initializeChatsListener(this, chatMessages, key_chat, howManyMsgToShow);
+
+        //fdm_chat.setFocusOnLast(true);
         setChatButtons();
     }
 
@@ -122,9 +124,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private void setMessageRecycler(){
         howManyMsgToShow = Constants.DEFAULT_MSG_SHOWN;
         fdm_chat = new FirebaseDbManager("chats");
-        boolean askLabel = askLabelling;
-        Log.w(TAG, "askLabel: " + String.valueOf(askLabel));
-        fdm_chat.setAskLabelling(askLabel);
+        //boolean askLabel = askLabelling;
+       // Log.w(TAG, "askLabel: " + String.valueOf(askLabel));
+        //fdm_chat.setAskLabelling(askLabel);
 
         MessageRecycler = (RecyclerView) findViewById(R.id.recycler_gchat);
         layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -209,7 +211,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 Log.w(TAG, "ask labelling is " + String.valueOf(fdm_chat.isAskLabelling()));
                 Log.w(TAG, "Message size " + message_size);
 
-                if(fdm_chat.getFocusOnLast() && fdm_chat.isAskLabelling() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
+                if(askLabelling && fdm_chat.getNewMsgCounter() >= Constants.LABELLING_API_MESSAGE_SIZE && fdm_chat.getNewMsgCounter() % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
                     Log.i(TAG, "Labelling request");
                     fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
                     lastIndex = message_size;
@@ -218,6 +220,15 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     LabelingRequiredAlertDialogueFragment dialog = new LabelingRequiredAlertDialogueFragment(getApplicationContext(), sublist, chatUserUid, chatUserName);
                     dialog.show(getSupportFragmentManager(), "MyDialogFragmentTag");
                 }
+               /* if(fdm_chat.isAskLabelling() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE && message_size % Constants.LABELLING_API_MESSAGE_SIZE == 0 && Constants.LABELLING_REQUIRED){
+                    Log.i(TAG, "Labelling request");
+                    fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
+                    lastIndex = message_size;
+                    Log.i(TAG, "Created Labeling request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
+                    List<Message> sublist = chatMessages.subList(fromIndex, lastIndex);
+                    LabelingRequiredAlertDialogueFragment dialog = new LabelingRequiredAlertDialogueFragment(getApplicationContext(), sublist, chatUserUid, chatUserName);
+                    dialog.show(getSupportFragmentManager(), "MyDialogFragmentTag");
+                }*/
             }
         });
     }

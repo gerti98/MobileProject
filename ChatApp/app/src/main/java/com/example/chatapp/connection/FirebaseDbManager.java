@@ -3,7 +3,6 @@ package com.example.chatapp.connection;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -44,7 +43,7 @@ public class FirebaseDbManager {
     private FirebaseDatabase dbInstance;
     private StorageReference storage;
     private boolean focusOnLast = true;
-    int focusCounter;
+    int newMsgCounter = 0;
     ChildEventListener chatsListener;
     boolean askLabelling = true;
 
@@ -102,11 +101,9 @@ public class FirebaseDbManager {
     public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat, int howManyMsgToShow){
         if(howManyMsgToShow!= Constants.DEFAULT_MSG_SHOWN)
             db.child(key_chat+"/messages").removeEventListener(chatsListener);
-        focusCounter = 0;
         chatsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-                Log.w(TAG, "AAAAAAAAAAA");
                 // If no users are logged in I remove the listener
                 if (FirebaseAuth.getInstance().getCurrentUser() == null){
                     db.child(key_chat+"/messages").removeEventListener(this);
@@ -121,23 +118,20 @@ public class FirebaseDbManager {
                      * 5 (i.e. increment = 5) then for the next 5 messages added the focus on the most recent message must not be done*/
 
                     Long datetime = System.currentTimeMillis();
-                    if(datetime>result.getTimestamp()){
+                    Log.w(TAG, "msg size:" + String.valueOf(messageList.size()) + " msglist:" + messageList );
+
+                    if(focusOnLast && howManyMsgToShow!=Constants.DEFAULT_MSG_SHOWN)
+                        rv.scrollToPosition(messageList.size()-1);
+
+                    if(datetime>result.getTimestamp()) {
                         // This means that the message result is an old message
-                        askLabelling = false;
+                        focusOnLast = false;
                     }
                     else{
-                        askLabelling = true;
-                    }
-                    if(focusOnLast)
-                        rv.scrollToPosition(messageList.size()-1);
-                    /*else if(focusCounter < Constants.MSG_TO_SHOW_INCREMENT)
-                        focusCounter++;
-                    else if(focusCounter == Constants.MSG_TO_SHOW_INCREMENT) {
-                        focusCounter = 0;
+                        newMsgCounter++;
                         focusOnLast = true;
-                        // New message so I have to set askLabelling to True
-                        askLabelling = true;
-                    }*/
+                    }
+
                     // Download the audio message if it is an audio message
                     if (!result.getIsAudio())
                         return;
@@ -169,6 +163,14 @@ public class FirebaseDbManager {
         };
         // Adding the listener to the chat
         db.child(key_chat+"/messages").limitToLast(howManyMsgToShow).addChildEventListener(chatsListener);
+    }
+
+    public int getNewMsgCounter() {
+        return newMsgCounter;
+    }
+
+    public void setNewMsgCounter(int newMsgCounter) {
+        this.newMsgCounter = newMsgCounter;
     }
 
     public boolean isAskLabelling() {
