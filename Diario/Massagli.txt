@@ -37,4 +37,10 @@ Meeting with Francesco Iemma: Discussion about the voice detection implementatio
 
 Group Meeting: Discussion about deploying problems due to Heroku slug size limitation for the free version after the deployment of the second model for classifying voice-based inputs
 
+20/05/2022
 
+Group Meeting: Discussion about App finalization. Setting up of experiment to be done: comparison of classification performance and Power usage study.
+
+23/05/2022
+
+Commented the code and the jupyter notebooks
