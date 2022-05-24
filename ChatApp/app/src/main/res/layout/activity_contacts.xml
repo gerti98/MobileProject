@@ -21,7 +21,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.SearchView
-        android:background="@drawable/background_searchbox"
         android:id="@+id/search_box"
         android:layout_width="352dp"
         android:layout_height="53dp"
