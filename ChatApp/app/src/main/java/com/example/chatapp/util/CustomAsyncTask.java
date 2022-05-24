@@ -12,7 +12,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CustomAsyncTask extends AsyncTask {
-    private static final String TAG = "ChatActivity";
+    private static final String TAG = "ChatApp/ChatActivity";
     private UICallback responseCallbacks;
     private List<Request> requestList;
     private List<String> results;

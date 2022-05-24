@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassificationInfoActivity  extends AppCompatActivity implements UICallback {
-    private static final String TAG = "ChatActivity";
+    private static final String TAG = "ChatApp/ChatActivity";
     List<Message> chatMessages;
     ImageView peerImageView;
     ImageView yourImageView;
@@ -39,13 +39,23 @@ public class ClassificationInfoActivity  extends AppCompatActivity implements UI
         EmotionClassificationLogic emotionClassificationLogic = new EmotionClassificationLogic(displayName);
         List<Message> peerMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, (String) peerImageView.getTag(),2);
         List<Message> yourMessages = emotionClassificationLogic.getCommonMessagesToClassify(chatMessages, (String) yourImageView.getTag(),1);
-        Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
+        Log.i(TAG, "YourMessages to classify: " + yourMessages.size());
         Log.i(TAG, "PeerMessages to classify: " + peerMessages.size());
         if(peerMessages.size() > 0){
+            StringBuilder messages = new StringBuilder();
+            for(Message m: peerMessages){
+                messages.append(m.getText()).append(", ");
+            }
+            Log.i(TAG, "Classifying (peer): [" + messages + "]");
             emotionClassificationLogic.performMessageClassification(getApplicationContext(), peerMessages, (UICallback) this, 2);
         }
 
         if(yourMessages.size() > 0){
+            StringBuilder messages = new StringBuilder();
+            for(Message m: yourMessages){
+                 messages.append(m.getText()).append(", ");
+            }
+            Log.i(TAG, "Classifying (your): [" + messages + "]");
             emotionClassificationLogic.performMessageClassification(getApplicationContext(), yourMessages, (UICallback) this, 1);
         }
     }
