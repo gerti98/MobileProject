@@ -106,6 +106,7 @@ public class FirebaseDbManager {
         chatsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+                Log.w(TAG, "AAAAAAAAAAA");
                 // If no users are logged in I remove the listener
                 if (FirebaseAuth.getInstance().getCurrentUser() == null){
                     db.child(key_chat+"/messages").removeEventListener(this);
@@ -118,16 +119,25 @@ public class FirebaseDbManager {
 
                     /* If focusOnLast is false this means that old messages are loaded, since the load messages are
                      * 5 (i.e. increment = 5) then for the next 5 messages added the focus on the most recent message must not be done*/
+
+                    Long datetime = System.currentTimeMillis();
+                    if(datetime>result.getTimestamp()){
+                        // This means that the message result is an old message
+                        askLabelling = false;
+                    }
+                    else{
+                        askLabelling = true;
+                    }
                     if(focusOnLast)
                         rv.scrollToPosition(messageList.size()-1);
-                    else if(focusCounter < Constants.MSG_TO_SHOW_INCREMENT)
+                    /*else if(focusCounter < Constants.MSG_TO_SHOW_INCREMENT)
                         focusCounter++;
                     else if(focusCounter == Constants.MSG_TO_SHOW_INCREMENT) {
                         focusCounter = 0;
                         focusOnLast = true;
                         // New message so I have to set askLabelling to True
                         askLabelling = true;
-                    }
+                    }*/
                     // Download the audio message if it is an audio message
                     if (!result.getIsAudio())
                         return;

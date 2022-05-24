@@ -183,7 +183,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                     howManyMsgToShow += Constants.MSG_TO_SHOW_INCREMENT;
                     fdm_chat.setFocusOnLast(false);
                     fdm_chat.initializeChatsListener(thisActivity, chatMessages, key_chat, howManyMsgToShow);
-                    //if(howManyMsgToShow>chatMessages.size())
                     stop = true;
                 }
             }
