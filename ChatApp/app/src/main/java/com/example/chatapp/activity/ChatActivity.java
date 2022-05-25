@@ -2,6 +2,7 @@ package com.example.chatapp.activity;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -12,6 +13,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.connection.FirebaseDbManager;
@@ -52,7 +55,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private ImageButton sendMsgBtn;
     private ImageButton sendRecBtn;
     private ImageButton loadMessagesBtn;
+    private ImageButton dropChatDownBtn;
     private EditText editTextMsg;
+    private TextView newMsgNumberText;
     private Toolbar chatToolbar;
     private FirebaseDbManager fdm_chat;
     private LinearLayoutManager layoutManager;
@@ -66,7 +71,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private boolean isRecording = false;
     private boolean stop;
     private boolean askLabelling;
-    public static int numberOfLastLoadedMsgs = -1;
+    public static int numberOfLastLoadedMsgs = -1; //-1 to distinguish between opened chat and chat with no loaded messages
     public static int numberOfNewMessages = 0;
     private long openChatTimestamp;
 
@@ -93,9 +98,11 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         sendMsgBtn = findViewById(R.id.send_msg_btn);
         sendRecBtn = findViewById(R.id.send_rec_btn);
         loadMessagesBtn = findViewById(R.id.load_messages_button);
+        dropChatDownBtn = findViewById(R.id.drop_chat_down_btn);
 
         editTextMsg = findViewById(R.id.edit_text_message);
         emotionImageView = findViewById(R.id.emotion_imageview);
+        newMsgNumberText = findViewById(R.id.new_msg_number_text);
 
         addEmotionImageViewListener();
         setMessageRecycler();
@@ -131,6 +138,19 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setStackFromEnd(true);
         MessageRecycler.setLayoutManager(layoutManager);
+
+        MessageRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if(layoutManager.findLastCompletelyVisibleItemPosition()==chatMessages.size()-1) {
+                    Toast.makeText(thisActivity, "ehi", Toast.LENGTH_SHORT);
+                    newMsgNumberText.setText(String.valueOf(0));
+                    newMsgNumberText.setTextColor(Color.BLACK);
+                    /*newMsgNumberText.setTextColor(getResources().getColor(R.color.black))*/;
+                }
+            }
+        });
 
         setMessageRecyclerTouchListener();
         setMessageRecyclerLayoutChangeListener();
@@ -240,11 +260,18 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 fdm_chat.loadMoreMessages(thisActivity, key_chat, howManyMsgToShow, chatMessages);
             }
             //distinguish the case of new opened chat and a chat that has no more messages to load
-            else if(numberOfLastLoadedMsgs == -1){
+            else if(numberOfLastLoadedMsgs == -1 && chatMessages.size()>0){
                 numberOfLastLoadedMsgs = 0;
                 int howManyMsgToShow = Constants.MSG_TO_SHOW_INCREMENT+chatMessages.size();
                 fdm_chat.loadMoreMessages(thisActivity, key_chat, howManyMsgToShow, chatMessages);
             }
+            else{
+                numberOfLastLoadedMsgs = 0;
+            }
+        });
+
+        dropChatDownBtn.setOnClickListener(v -> {
+            MessageRecycler.scrollToPosition(chatMessages.size()-1);
         });
     }
 

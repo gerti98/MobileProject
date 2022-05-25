@@ -1,15 +1,18 @@
 package com.example.chatapp.connection;
 
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatapp.R;
@@ -123,6 +126,14 @@ public class FirebaseDbManager {
                     //as new, so they will be taken into account for the labelling
                     if (message.getTimestamp() > openTimestamp){
                         ChatActivity.numberOfNewMessages++;
+                        LinearLayoutManager layoutManager = (LinearLayoutManager) rv.getLayoutManager();
+                        if (layoutManager.findLastCompletelyVisibleItemPosition() != messageList.size()-1){
+                            TextView new_msg_number_text = chatActivity.findViewById(R.id.new_msg_number_text);
+                            int new_msgs = Integer.parseInt(String.valueOf(new_msg_number_text.getText()));
+                            new_msgs++;
+                            new_msg_number_text.setText(String.valueOf(new_msgs));
+                            new_msg_number_text.setTextColor(Color.parseColor("#1aab51"));
+                        }
                     }
 
                     // if the message is of the sender the focus is at the end of the RecyclerView
