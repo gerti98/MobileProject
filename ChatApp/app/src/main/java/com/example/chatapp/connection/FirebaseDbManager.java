@@ -323,7 +323,7 @@ public class FirebaseDbManager {
                     fos.write(bytes);
                     Toast.makeText(chatActivity, "Rec downloaded", Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
-                    Toast.makeText(chatActivity, "Error during registration download " + fileName + " " + whereToSave, Toast.LENGTH_LONG).show();
+                    Toast.makeText(chatActivity, "Error during registration download - Maybe too long recording " + fileName + " " + whereToSave, Toast.LENGTH_LONG).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
