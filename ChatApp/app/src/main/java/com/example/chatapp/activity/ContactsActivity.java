@@ -71,10 +71,6 @@ public class ContactsActivity extends AppCompatActivity {
             Intent auth_user = new Intent (getApplicationContext(), NotificationHandlerService.class);
             stopService(auth_user);
 
-            //save all the current favorites in the persistent file
-            /*FavoritesHandler.saveUserFavorites(getApplicationContext());
-            FavoritesHandler.clearFavoritesFromMemory();*/
-
             //back to MainActivity
             Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent1);

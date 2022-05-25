@@ -16,7 +16,7 @@ public class Constants {
     public final static int MAX_FAVORITES_LIST_SIZE = 50;
 
     public final static int MSG_TO_SHOW_INCREMENT = 5;
-    public final static int DEFAULT_MSG_SHOWN = 15;
+    public final static int DEFAULT_MSG_SHOWN = 5;
 
     public final static String dbName = "https://chatapp-8aa46-default-rtdb.europe-west1.firebasedatabase.app/";
     public final static String storageName = "gs://chatapp-8aa46.appspot.com";

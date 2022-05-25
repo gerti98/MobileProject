@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatapp.R;
+import com.example.chatapp.activity.ChatActivity;
 import com.example.chatapp.adapter.ContactsAdapter;
 import com.example.chatapp.adapter.MessageAdapter;
 import com.example.chatapp.dto.Message;
@@ -36,6 +37,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class FirebaseDbManager {
     private StorageReference storage;
     private boolean focusOnLast = true;
     int focusCounter;
+    private boolean openedChat = true;
     ChildEventListener chatsListener;
     boolean askLabelling = true;
 
@@ -99,53 +102,42 @@ public class FirebaseDbManager {
     }
 
     // initialize the listener to update the current chat UI
-    public void initializeChatsListener(AppCompatActivity usersActivity, List<Message> messageList, String key_chat, int howManyMsgToShow){
-        if(howManyMsgToShow!= Constants.DEFAULT_MSG_SHOWN)
-            db.child(key_chat+"/messages").removeEventListener(chatsListener);
-        focusCounter = 0;
+    public void initializeChatsListener(AppCompatActivity chatActivity, List<Message> messageList,
+    String key_chat, long openTimestamp){
         chatsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-                Log.w(TAG, "AAAAAAAAAAA");
                 // If no users are logged in I remove the listener
                 if (FirebaseAuth.getInstance().getCurrentUser() == null){
                     db.child(key_chat+"/messages").removeEventListener(this);
                 }
                 else {
-                    Message result = dataSnapshot.getValue(Message.class);
-                    messageList.add(result);
-                    RecyclerView rv = (RecyclerView) usersActivity.findViewById(R.id.recycler_gchat);
-                    rv.setAdapter(new MessageAdapter(usersActivity, messageList));
+                    Message message = dataSnapshot.getValue(Message.class);
 
-                    /* If focusOnLast is false this means that old messages are loaded, since the load messages are
-                     * 5 (i.e. increment = 5) then for the next 5 messages added the focus on the most recent message must not be done*/
+                    messageList.add(message);
 
-                    Long datetime = System.currentTimeMillis();
-                    if(datetime>result.getTimestamp()){
-                        // This means that the message result is an old message
-                        askLabelling = false;
+                    RecyclerView rv = (RecyclerView) chatActivity.findViewById(R.id.recycler_gchat);
+                    rv.swapAdapter(new MessageAdapter(chatActivity, messageList), false);
+
+                    //if the messages are sent after the openTimestamp of the chat they are considered
+                    //as new, so they will be taken into account for the labelling
+                    if (message.getTimestamp() > openTimestamp){
+                        ChatActivity.numberOfNewMessages++;
                     }
-                    else{
-                        askLabelling = true;
-                    }
-                    if(focusOnLast)
+
+                    // if the message is of the sender the focus is at the end of the RecyclerView
+                    if (message.getSender_uid().equals(FirebaseAuth.getInstance().getUid())){
                         rv.scrollToPosition(messageList.size()-1);
-                    /*else if(focusCounter < Constants.MSG_TO_SHOW_INCREMENT)
-                        focusCounter++;
-                    else if(focusCounter == Constants.MSG_TO_SHOW_INCREMENT) {
-                        focusCounter = 0;
-                        focusOnLast = true;
-                        // New message so I have to set askLabelling to True
-                        askLabelling = true;
-                    }*/
+                    }
+
                     // Download the audio message if it is an audio message
-                    if (!result.getIsAudio())
+                    if (!message.getIsAudio())
                         return;
-                    String receivedRecFilePath = usersActivity.getExternalCacheDir().getAbsolutePath();
-                    receivedRecFilePath += result.getFilename();
+                    String receivedRecFilePath = chatActivity.getExternalCacheDir().getAbsolutePath();
+                    receivedRecFilePath += message.getFilename();
                     File newFile = new File(receivedRecFilePath);
                     if (!newFile.exists())
-                        new FirebaseDbManager().downloadAudio(result.getFilename(), receivedRecFilePath, usersActivity);
+                        new FirebaseDbManager().downloadAudio(message.getFilename(), receivedRecFilePath, chatActivity);
                 }
             }
 
@@ -168,8 +160,46 @@ public class FirebaseDbManager {
 
         };
         // Adding the listener to the chat
-        db.child(key_chat+"/messages").limitToLast(howManyMsgToShow).addChildEventListener(chatsListener);
+        db.child(key_chat+"/messages").limitToLast(Constants.DEFAULT_MSG_SHOWN).addChildEventListener(chatsListener);
     }
+
+    public void loadMoreMessages(AppCompatActivity chatActivity, String key_chat, int howMany, List<Message> messageList){
+        ValueEventListener singleValueListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //first timestamp of already shown messages
+                Long FirstTimestamp = messageList.get(0).getTimestamp();
+                ChatActivity.numberOfLastLoadedMsgs = 0;
+                List <Message> loaded_messages = new ArrayList<>();
+
+                for (DataSnapshot result : dataSnapshot.getChildren()) {
+                    Message message = result.getValue(Message.class);
+
+                    if (message.getTimestamp() < FirstTimestamp) {
+                        loaded_messages.add(message);
+                        ChatActivity.numberOfLastLoadedMsgs++;
+                    }
+                }
+                //adding the loaded of messages on the top of the chat
+                Collections.reverse(loaded_messages);
+                Collections.reverse(messageList);
+                messageList.addAll(loaded_messages);
+                Collections.reverse(messageList);
+
+                //update the view
+                RecyclerView rv = (RecyclerView) chatActivity.findViewById(R.id.recycler_gchat);
+                rv.swapAdapter(new MessageAdapter(chatActivity, messageList), false);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        db.child(key_chat+"/messages").limitToLast(howMany).addListenerForSingleValueEvent(singleValueListener);
+    }
+
+
 
     public boolean isAskLabelling() {
         return askLabelling;
@@ -179,11 +209,6 @@ public class FirebaseDbManager {
         this.askLabelling = askLabelling;
     }
 
-    public void setFocusOnLast(boolean focusOnLast) {
-        this.focusOnLast = focusOnLast;
-    }
-
-    public boolean getFocusOnLast() { return this.focusOnLast; }
 
     public void addUserToDB(FirebaseUser user) {
         Log.w(TAG, "Adding new user");
@@ -221,6 +246,7 @@ public class FirebaseDbManager {
         HashMap<String, Object> message = new HashMap<>();
         message.put("text", msg);
         message.put("sender_name", sender);
+        message.put("sender_uid", FirebaseAuth.getInstance().getUid());
         message.put("receiver_name", receiver);
         message.put("timestamp", ServerValue.TIMESTAMP);
         message.put("isAudio", false);
@@ -252,6 +278,7 @@ public class FirebaseDbManager {
                 message.put("text", textAudioMsg);
                 message.put("filename", filename);
                 message.put("sender_name", sender);
+                message.put("sender_uid", FirebaseAuth.getInstance().getUid());
                 message.put("receiver_name", receiver);
                 message.put("timestamp", ServerValue.TIMESTAMP);
                 message.put("isAudio", true);

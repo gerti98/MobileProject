@@ -8,8 +8,28 @@ public class Message implements Serializable {
     String filename;
     String sender_name;
     String receiver_name;
+
+    public String getSender_uid() {
+        return sender_uid;
+    }
+
+    public void setSender_uid(String sender_uid) {
+        this.sender_uid = sender_uid;
+    }
+
+    String sender_uid;
     Long timestamp;
     boolean isAudio;
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+
+    int counter;
 
     private Message(){
     }
@@ -39,6 +59,11 @@ public class Message implements Serializable {
         this.timestamp = timestamp;
         this.isAudio = isAudio;
         this.filename = filename;
+    }
+
+    @Override //debug
+    public String toString(){
+        return this.text;
     }
 
     public String getFilename() {
