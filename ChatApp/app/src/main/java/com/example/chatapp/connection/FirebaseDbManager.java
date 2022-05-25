@@ -48,11 +48,7 @@ public class FirebaseDbManager {
     private DatabaseReference db;
     private FirebaseDatabase dbInstance;
     private StorageReference storage;
-    private boolean focusOnLast = true;
-    int focusCounter;
-    private boolean openedChat = true;
     ChildEventListener chatsListener;
-    boolean askLabelling = true;
 
     final private String TAG = "ChatApp/DbManager";
 
@@ -209,17 +205,6 @@ public class FirebaseDbManager {
         };
         db.child(key_chat+"/messages").limitToLast(howMany).addListenerForSingleValueEvent(singleValueListener);
     }
-
-
-
-    public boolean isAskLabelling() {
-        return askLabelling;
-    }
-
-    public void setAskLabelling(boolean askLabelling) {
-        this.askLabelling = askLabelling;
-    }
-
 
     public void addUserToDB(FirebaseUser user) {
         Log.w(TAG, "Adding new user");

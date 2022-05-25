@@ -144,7 +144,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                 super.onScrolled(recyclerView, dx, dy);
 
                 if(layoutManager.findLastCompletelyVisibleItemPosition()==chatMessages.size()-1) {
-                    Toast.makeText(thisActivity, "ehi", Toast.LENGTH_SHORT);
                     newMsgNumberText.setText(String.valueOf(0));
                     newMsgNumberText.setTextColor(Color.BLACK);
                     /*newMsgNumberText.setTextColor(getResources().getColor(R.color.black))*/;
@@ -194,12 +193,14 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             }
 
             //Check need of manual labelling
-            Log.w(TAG, "ask labelling is " + String.valueOf(fdm_chat.isAskLabelling()));
+            Log.w(TAG, "ask labelling is " + String.valueOf(askLabelling));
             Log.w(TAG, "Message size " + message_size);
 
             //check if labelling has been already done or not, if message_size is more than 0 and if the new messages have
             //reached the threshold for the labelling
-            if(fdm_chat.isAskLabelling() && message_size >= Constants.LABELLING_API_MESSAGE_SIZE
+            System.out.println(numberOfNewMessages);
+            System.out.println(askLabelling);
+            if(askLabelling && message_size >= Constants.LABELLING_API_MESSAGE_SIZE
             && numberOfNewMessages>0 && numberOfNewMessages % Constants.LABELLING_API_MESSAGE_SIZE == 0
             && Constants.LABELLING_REQUIRED){
                 Log.i(TAG, "Labelling request");
