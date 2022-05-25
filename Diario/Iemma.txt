@@ -57,3 +57,13 @@ Create a representation of the system for the documentation.
 23/05/2022
 Collaborate to database cleanup. Search for testers.
 
+
+24/05/22
+Meeting for organization and to decide tests to do for power consumption and how to organize the labelling phase.
+Meeting for resolving a bug regarding the scrolling of the chat and the dynamic load of messages. Discussed how to resolve the bug and tested various solutions
+
+25/05/22
+Instruct testers on how to use the app and how to do the labelling. APK deployed.
+Chat session on the application with Olgerti Xhanej in order to do labelling and testing power consumption. Moreover we have found and then solved some bugs.
+
+
