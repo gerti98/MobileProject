@@ -39,6 +39,8 @@ import com.example.chatapp.util.Constants;
 import com.example.chatapp.util.WavRecorder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
 
 import java.io.Serializable;
@@ -73,6 +75,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private boolean askLabelling;
     public static int numberOfLastLoadedMsgs = -1; //-1 to distinguish between opened chat and chat with no loaded messages
     public static int numberOfNewMessages = 0;
+    private DatabaseReference dbRefMessages;
+    private ChildEventListener childEventListener;
     private long openChatTimestamp;
 
     //TODO: move constants into a better place
@@ -113,7 +117,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         intent.putExtra("user_active_chat", chatUserUid);
         startService(intent);
 
-        System.out.println("ehi" + chatUserName + chatUserUid + askLabelling);
+        /*System.out.println("ehi" + chatUserName + chatUserUid + askLabelling);*/
 
         //initialize the listener for the messages
         fdm_chat = new FirebaseDbManager("chats");
@@ -200,8 +204,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
 
             //check if labelling has been already done or not, if message_size is more than 0 and if the new messages have
             //reached the threshold for the labelling
-            System.out.println(numberOfNewMessages);
-            System.out.println(askLabelling);
+            /*System.out.println(numberOfNewMessages);
+            System.out.println(askLabelling);*/
 
             //resetting the possibility to ask for labelling
             if(numberOfNewMessages % Constants.LABELLING_API_MESSAGE_SIZE != 0)
@@ -288,6 +292,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        //detach the event onChildAdded
+        fdm_chat.detach();
         //resetting the parameters for loading new messages
         numberOfLastLoadedMsgs = -1;
         // Return to contacts and not to the labelling form
@@ -296,8 +302,9 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     }
 
     @Override
-    public void onStop() {
+    public void onStop(){
         super.onStop();
+        numberOfNewMessages = 0;
     }
 
     // function to establish the unique key_chat identifier based on the user's uid of the chat

@@ -21,6 +21,7 @@ import com.example.chatapp.adapter.ContactsAdapter;
 import com.example.chatapp.adapter.MessageAdapter;
 import com.example.chatapp.dto.Message;
 import com.example.chatapp.dto.User;
+import com.example.chatapp.firebasevent.FirebaseEventHandler;
 import com.example.chatapp.util.Constants;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,10 +49,14 @@ public class FirebaseDbManager {
     private DatabaseReference db;
     private FirebaseDatabase dbInstance;
     private StorageReference storage;
-    ChildEventListener chatsListener;
+    private DatabaseReference privateDbReference;
+    private ChildEventListener privateChildEventListener;
 
     final private String TAG = "ChatApp/DbManager";
 
+    public void detach(){
+        privateDbReference.removeEventListener(privateChildEventListener);
+    }
 
     public FirebaseDbManager() {
         this.dbInstance = FirebaseDatabase.getInstance(Constants.dbName);
@@ -103,7 +108,7 @@ public class FirebaseDbManager {
     // initialize the listener to update the current chat UI
     public void initializeChatsListener(AppCompatActivity chatActivity, List<Message> messageList,
     String key_chat, long openTimestamp){
-        chatsListener = new ChildEventListener() {
+        privateChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
                 // If no users are logged in I remove the listener
@@ -167,7 +172,8 @@ public class FirebaseDbManager {
 
         };
         // Adding the listener to the chat
-        db.child(key_chat+"/messages").limitToLast(Constants.DEFAULT_MSG_SHOWN).addChildEventListener(chatsListener);
+        privateDbReference = db.child(key_chat+"/messages");
+        privateDbReference.limitToLast(Constants.DEFAULT_MSG_SHOWN).addChildEventListener(privateChildEventListener);
     }
 
     public void loadMoreMessages(AppCompatActivity chatActivity, String key_chat, int howMany, List<Message> messageList){
