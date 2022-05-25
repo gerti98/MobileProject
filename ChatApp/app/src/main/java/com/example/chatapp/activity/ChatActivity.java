@@ -188,7 +188,6 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         MessageRecycler.addOnLayoutChangeListener((view, i, i1, i2, i3, i4, i5, i6, i7) -> {
             int message_size = chatMessages.size();
             int fromIndex, lastIndex;
-
             EmotionClassificationLogic classificationLogic = new EmotionClassificationLogic(chatUserName);
             List<Message> messagesToClassify = classificationLogic.getCommonMessagesToClassify
             (chatMessages, (String) emotionImageView.getTag());
