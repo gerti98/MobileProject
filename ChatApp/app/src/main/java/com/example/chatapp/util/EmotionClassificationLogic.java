@@ -103,6 +103,9 @@ public class EmotionClassificationLogic {
 
     }
     public static void setImageViewEmoji(String winnerEmotion, ImageView emotionImageView){
+        if(winnerEmotion == null)
+            return;
+
         if (winnerEmotion.equals("joy")) {
             Log.i(TAG, "Joy change");
             emotionImageView.setImageResource(R.drawable.ic_joy_emoji);
