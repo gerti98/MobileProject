@@ -113,6 +113,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         intent.putExtra("user_active_chat", chatUserUid);
         startService(intent);
 
+        System.out.println("ehi" + chatUserName + chatUserUid + askLabelling);
+
         //initialize the listener for the messages
         fdm_chat = new FirebaseDbManager("chats");
         fdm_chat.initializeChatsListener(this, chatMessages, key_chat, openChatTimestamp);
@@ -200,10 +202,16 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             //reached the threshold for the labelling
             System.out.println(numberOfNewMessages);
             System.out.println(askLabelling);
+
+            //resetting the possibility to ask for labelling
+            if(numberOfNewMessages % Constants.LABELLING_API_MESSAGE_SIZE != 0)
+                askLabelling = true;
+
             if(askLabelling && message_size >= Constants.LABELLING_API_MESSAGE_SIZE
             && numberOfNewMessages>0 && numberOfNewMessages % Constants.LABELLING_API_MESSAGE_SIZE == 0
             && Constants.LABELLING_REQUIRED){
                 Log.i(TAG, "Labelling request");
+                askLabelling = false;
                 fromIndex = message_size - Constants.LABELLING_API_MESSAGE_SIZE;
                 lastIndex = message_size;
                 Log.i(TAG, "Created Labeling request: [from: " + fromIndex + ", to (exclusive): " + lastIndex + "]");
