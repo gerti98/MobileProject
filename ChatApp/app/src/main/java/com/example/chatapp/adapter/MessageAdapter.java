@@ -37,7 +37,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
         Message message = (Message) messageList.get(position);
 
         //if the current user is in the sender, show his messages in sender pov
-        if (message.getSender_name().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+        if (message.getSender_uid().equals(FirebaseAuth.getInstance().getUid())) {
             return MESSAGE_SENT_TYPE;
         } else {
             return MESSAGE_RECEIVED_TYPE;

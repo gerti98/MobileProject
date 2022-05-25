@@ -84,7 +84,7 @@ public class NotificationHandlerService extends Service {
                     //for each entry check if there are new messages from that sender and if the chat is no
                     if (!nEntity.isChecked()) {
 
-                        //if the notification is from the user of the active chat and app is in foregroung,
+                        //if the notification is from the user of the active chat and app is in foreground,
                         // the service does not show the notification but update its status on firebase db
                         if(child.getKey().equals(activeUserChat) && isForeground){
                             new FirebaseDbManager("notifications").updateMessageNotificationEntity(FirebaseAuth.getInstance()
