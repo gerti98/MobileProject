@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -43,6 +44,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -169,8 +171,12 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
                         Message msg = chatMessages.get(position);
                         if(!msg.getIsAudio())
                             return;
+
                         String receivedRecFilePath = getExternalCacheDir().getAbsolutePath();
                         receivedRecFilePath += msg.getFilename();
+                        File newFile = new File(receivedRecFilePath);
+                        if (!newFile.exists())
+                            new FirebaseDbManager().downloadAudio(msg.getFilename(), receivedRecFilePath, thisActivity);
                         MediaPlayer mediaPlayer = MediaPlayer.create(thisActivity, Uri.parse(receivedRecFilePath));
                         mediaPlayer.start(); // no need to call prepare(); create() does that for you
                     }

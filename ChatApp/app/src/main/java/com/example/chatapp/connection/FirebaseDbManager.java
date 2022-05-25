@@ -3,6 +3,7 @@ package com.example.chatapp.connection;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -309,11 +311,11 @@ public class FirebaseDbManager {
         notificationInstanceRef.setValue(notification);
     }
 
-    void downloadAudio(String fileName, String whereToSave, AppCompatActivity chatActivity) {
+    public void downloadAudio(String fileName, String whereToSave, AppCompatActivity chatActivity) {
         String filePath = "audio/" + fileName;
         StorageReference audioFileReference = storage.child(filePath);
 
-        final long ONE_MEGABYTE = 1024 * 1024;
+        final long ONE_MEGABYTE = 1024 * 1024 * 10;
         audioFileReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
