@@ -2,61 +2,76 @@ package com.example.chatapp.util;
 
 import com.example.chatapp.dto.Message;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JSONBuilder {
     public static String buildMessageTextJSON(List<Message> messages){
-        StringBuilder json = new StringBuilder("{ \"msgs\" : [");
-        if(messages != null) {
-            for (Message message : messages)
-                if (!message.getIsAudio())
-                    json.append("\"").append(message.getText()).append("\",");
-            json.deleteCharAt(json.length()-1);
+        JSONObject mainObj = new JSONObject();
+        JSONArray ja = new JSONArray();
+        try{
+            if(messages != null) {
+                for (Message message : messages)
+                    if (!message.getIsAudio())
+                        ja.put(message.getText());
+            }
+            mainObj.put("msgs", ja);
+            StringWriter out = new StringWriter();
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        json.append("]}");
-        return json.toString();
+        return mainObj.toString();
     }
 
-    //List of list of this format expected:
+        //List of list of this format expected:
     //      0        1
     //0: Message, label
     //1: Message, label
     //2: Message, label
     public static String buildLabelingJSON(ArrayList<ArrayList<Object>> labelingFormData){
-        StringBuilder json = new StringBuilder("{ \"text_labels\" : [");
         Message message;
         String label;
-        boolean any_text = false, any_audio = false;
+        JSONObject mainObj = new JSONObject();
+        JSONArray text_ja = new JSONArray();
+        JSONArray audio_ja = new JSONArray();
+        JSONArray inner_ja;
 
         for (ArrayList<Object> labels : labelingFormData){
             message = (Message) labels.get(0);
             label = (String) labels.get(1);
 
             if(!message.getIsAudio()){
-                json.append("[\"").append(message.getText()).append("\",").append("\"").append(label).append("\"],");
-                any_text = true;
+                inner_ja = new JSONArray();
+                inner_ja.put(message.getText());
+                inner_ja.put(label);
+                text_ja.put(inner_ja);
             }
         }
-        if(any_text)
-            json.deleteCharAt(json.length()-1);
-        json.append("],  \"audio_labels\" : [");
 
         for (ArrayList<Object> labels : labelingFormData){
             message = (Message) labels.get(0);
             label = (String) labels.get(1);
 
             if(message.getIsAudio()){
-                json.append("[\"").append(message.getFilename().replace("/", "")).append("\",").append("\"").append(label).append("\"],");
-                any_audio = true;
+                inner_ja = new JSONArray();
+                inner_ja.put(message.getFilename().replace("/", ""));
+                inner_ja.put(label);
+                audio_ja.put(inner_ja);
             }
         }
 
-        if(any_audio)
-            json.deleteCharAt(json.length()-1);
+        try {
+            mainObj.put("text_labels", text_ja);
+            mainObj.put("audio_labels", audio_ja);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        json.append("]}");
-        return json.toString();
-
+        return mainObj.toString();
     }
 }

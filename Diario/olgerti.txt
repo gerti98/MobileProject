@@ -37,4 +37,11 @@ Performing manual labeling activity by sending messages (text and audio) to peop
 Searching for candidates to join for experiment purposes.
 Preparing guide for candidates to perform labeling of messages.
 
+24/05/2022
+Searching for candidates to join for experiment purposes.
+Performing labeling through the application.
+Group Meeting: discussed about last experiments to be performed, and parameters to be set to perform power usage comparison.
 
+25/05/2022
+Performing labeling through the application.
+Distributing apk file to candidates and giving support for executing the app.
