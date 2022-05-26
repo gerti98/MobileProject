@@ -66,4 +66,7 @@ Meeting for resolving a bug regarding the scrolling of the chat and the dynamic 
 Instruct testers on how to use the app and how to do the labelling. APK deployed.
 Chat session on the application with Olgerti Xhanej in order to do labelling and testing power consumption. Moreover we have found and then solved some bugs.
 
+26/05/22
+Chat Sessions for acquire new data. More power consumption tests done.
+
 
