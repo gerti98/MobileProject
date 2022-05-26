@@ -68,5 +68,6 @@ Chat session on the application with Olgerti Xhanej in order to do labelling and
 
 26/05/22
 Chat Sessions for acquire new data. More power consumption tests done.
+Meeting for discussing results and improving textual classifier performance.
 
 
