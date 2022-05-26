@@ -80,6 +80,8 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
     private DatabaseReference dbRefMessages;
     private ChildEventListener childEventListener;
     private long openChatTimestamp;
+    String currentUserUid = "AR47NLFVJygxpw5is5ZNP3AJZQ03";
+    String displayName = "Olgerti Xhanej";
 
     //TODO: move constants into a better place
 
@@ -90,12 +92,17 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         openChatTimestamp = System.currentTimeMillis();
 
         //chat info
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        currentUser = MainActivity.mAuth.getCurrentUser();
+
         Intent i = getIntent();
         chatUserName = i.getStringExtra("chat_user_name");
         chatUserUid = i.getStringExtra("chat_user_uid");
+
+        Log.i(TAG, "ChatUserUID: " + chatUserUid);
+        Log.i(TAG, "ChatUserName: " + chatUserName);
+
         askLabelling = i.getBooleanExtra("askLabelling", true);
-        key_chat = establishKeychat(currentUser.getUid(), chatUserUid);
+        key_chat = establishKeychat(currentUserUid, chatUserUid);
         chatMessages = new ArrayList<>();
 
         //UI init
@@ -134,7 +141,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ClassificationInfoActivity.class);
                 intent.putExtra("messages", (Serializable) chatMessages);
-                intent.putExtra("displayName", currentUser.getDisplayName());
+                intent.putExtra("displayName", displayName);
                 startActivity(intent);
             }
         });
@@ -239,7 +246,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
             String msg = editTextMsg.getText().toString();
             if (!msg.equals("")){
                 editTextMsg.setText("");
-                new FirebaseDbManager().addMessageToChat(key_chat, currentUser.getDisplayName(),
+                new FirebaseDbManager().addMessageToChat(key_chat, displayName,
                 chatUserName, chatUserUid, msg);
             }
         });
@@ -350,7 +357,7 @@ public class ChatActivity extends AppCompatActivity implements UICallback {
         // Uncomment only for debuggin purposes
         // MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(recFilePath));
         // mediaPlayer.start(); // no need to call prepare(); create() does that for you
-        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, currentUser.getDisplayName(),
+        new FirebaseDbManager().addAudioToChat(recFilePath, audioFilename, key_chat, displayName,
         chatUserName, chatUserUid, this);
     }
 

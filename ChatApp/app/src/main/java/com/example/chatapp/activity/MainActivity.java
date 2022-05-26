@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     final static String TAG = "MainActivity";
     private GoogleSignInClient mGoogleSignInClient;
     private final static int RC_SIGN_IN = 123;
-    private FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
 
     @Override
     protected void onStart() {

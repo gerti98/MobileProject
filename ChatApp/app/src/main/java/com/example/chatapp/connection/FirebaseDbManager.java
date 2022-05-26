@@ -149,8 +149,9 @@ public class FirebaseDbManager {
                     String receivedRecFilePath = chatActivity.getExternalCacheDir().getAbsolutePath();
                     receivedRecFilePath += message.getFilename();
                     File newFile = new File(receivedRecFilePath);
-                    if (!newFile.exists())
+                    if (!newFile.exists() || Constants.CACHE_AUDIO_MESSAGES_DISABLED){
                         new FirebaseDbManager().downloadAudio(message.getFilename(), receivedRecFilePath, chatActivity);
+                    }
                 }
             }
 
