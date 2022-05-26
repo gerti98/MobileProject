@@ -121,7 +121,7 @@ public class EmotionClassificationLogic {
             emotionImageView.setTag("fear");
         } else if(winnerEmotion.equals("anger")) {
             emotionImageView.setImageResource(R.drawable.ic_angry_emoji);
-            emotionImageView.setTag("fear");
+            emotionImageView.setTag("anger");
         }
     }
 
