@@ -45,3 +45,7 @@ Group Meeting: discussed about last experiments to be performed, and parameters 
 25/05/2022
 Performing labeling through the application.
 Distributing apk file to candidates and giving support for executing the app.
+
+
+26/05/2022
+Performing labeling through the application.
