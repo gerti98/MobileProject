@@ -12,11 +12,11 @@ adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user
 timeout 15
 adb shell input keyevent 4
 
-adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "AR47NLFVJygxpw5is5ZNP3AJZQ03"
+adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "MHZsUPUgc0OrK8JDpzts1N27neA3"
 timeout 15
 adb shell input keyevent 4
 
-adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "AR47NLFVJygxpw5is5ZNP3AJZQ03"
+adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "p7nq5IXiNGXJ4aSOoD34E2iuKkk1"
 timeout 15
 adb shell input keyevent 4
 
