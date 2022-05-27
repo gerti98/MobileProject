@@ -13,8 +13,25 @@ echo "Countdown"
 
 cd $HOME/Android/Sdk/platform-tools
 
+# ---------------- For testing purposes -------------------
+
+./adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "AR47NLFVJygxpw5is5ZNP3AJZQ03"
+timeout 15
+./adb shell input keyevent 4
+
+./adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "AR47NLFVJygxpw5is5ZNP3AJZQ03"
+timeout 15
+./adb shell input keyevent 4
+
+./adb shell am start -n com.example.chatapp/.activity.ChatActivity --es "chat_user_uid" "AR47NLFVJygxpw5is5ZNP3AJZQ03"
+timeout 15
+./adb shell input keyevent 4
 
 ./adb bugreport results/to_be_deleted.zip
+
+
+# ---------------- Experiments -------------------
+
 
 ./adb shell dumpsys batterystats --reset
 for (( c_=$START_IN; c_<=$END_IN; c_++ ))
