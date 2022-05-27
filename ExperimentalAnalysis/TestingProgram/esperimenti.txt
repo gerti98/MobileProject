@@ -1,0 +1,14 @@
+ESPERIMENTI
+
+Tempo per esperimento: 20min
+
+Riapertura: 15s
+
+#1
+10 messaggi testo
+
+#2
+9 text, 1 audio (max)
+
+#3
+7 text, 3 audio (max)
