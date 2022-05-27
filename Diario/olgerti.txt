@@ -49,3 +49,8 @@ Distributing apk file to candidates and giving support for executing the app.
 
 26/05/2022
 Performing labeling through the application.
+
+27/05/2022
+Performing labeling through the application.
+Team meeting: explanation on how to run the script for the experiment about power usage
+Running experiment about power usage
