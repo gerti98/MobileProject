@@ -42,9 +42,12 @@ def predict_text_emotion():
     list_of_msg = request_json['msgs'] # Get the list of msgs
 
     # Predictions based on the msgs
-    svm_predictions = detect_emotions_with_proba(svm_model, vectorizer, list_of_msg)
-    predict_emotion_inv = proba_to_labels(encoder, svm_predictions)
-    print(predict_emotion_inv)
+    if list_of_msg:
+        svm_predictions = detect_emotions_with_proba(svm_model, vectorizer, list_of_msg)
+        predict_emotion_inv = proba_to_labels(encoder, svm_predictions)
+        print(predict_emotion_inv)
+    else:
+        predict_emotion_inv = []
 
     return jsonify(predict_emotion_inv) # Return the list of emotions predictions
 

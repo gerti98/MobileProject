@@ -1,0 +1,1 @@
+{ "text_labels" : [["hello","neutral"],["how are you?","neutral"],["I'm okay","joy"],["But I have fear","fear"],["please defend me","fear"],["Or I don't know what to do","sadness"],["because I feel hopeless","sadness"],["oh don't worry","neutral"],["I will help you","neutral"],["Come on","neutral"]],  "audio_labels" : []}

@@ -1,0 +1,1 @@
+{ "text_labels" : [["I'm really serious man, stop talking!!!","angry"],["Come on!","neutral"],["Let's win this match","neutral"],["Please don't bother me!","angry"],["I love this day!","joy"]],  "audio_labels" : [["audio1653415771.wav","sadness"],["audio1653415784.wav","joy"],["audio1653415810.wav","neutral"],["audio1653415822.wav","fear"],["audio1653415842.wav","angry"]]}
