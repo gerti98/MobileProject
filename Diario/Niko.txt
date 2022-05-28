@@ -1,1 +1,44 @@
+NIKO SALAMINI
 
+Total Commits:
+Number of lines of code:
+
+Diary of non-coding activities:
+
+30/04/2022
+Group Meeting: discussion about possible solutions regarding the implementation of the videochat architecture.
+
+05/05/2022
+Group Meeting: discussion about the issues of implementing a videochat using WebRTC. The lack of documentation about this topic has led to switching the project from a videochat app to a textual/vocal chat app.
+
+08/05/2022: 
+Study of the firebase documentation about storing/receiving data.
+
+10/05/2022
+Group Meeting: In this meeting we have discussed different solutions for the classification of the message's emotion. The app will rely on a Rest API that takes in input the messages/vocals and output the classified emotion.
+
+13/05/2022
+Group Meeting: Discussion about how to implement the emotion detection system in the case of vocals, the idea was to represent the audio file as MFFC coefficients as shown in one of the papers presented by the group. To perform this task the app rely on an MLP neural network that takes in input those coefficients.
+
+17/05/2022
+Group Meeting: Discussion about heroku's limitations for the free version when deploying the classification model for voice-based inputs. Work division.
+
+20/05/2022
+Group Meeting: Discussion about the completeness of the functionalities in the application. Discussion about the testing phase, we have decided to record statistics about the power consumption and labelling.
+Bug resolution with team members, it has been found thanks to one of the testers.
+
+22/05/2022
+Exploring the adb shell functionalities for collecting power consumption in order to be ready for the experimental tests. Exploring battery-historian tool.
+
+24/05/2022
+Group meeting: Resolving a bug regarding the dynamic load of chat messages while scrolling. Discussion about a possible solution.
+Search for testers, performing some labelling.
+
+25/05/2022
+Distributing the apk, explaining the app to the testers, performing some labelling.
+
+27/05/2022
+Team meeting: Discussion about the script to run for the power statistics gathering.
+
+28/05/2022
+Performing the experimental test for the power consumption.
