@@ -62,12 +62,24 @@ Collaborate to database cleanup. Search for testers.
 Meeting for organization and to decide tests to do for power consumption and how to organize the labelling phase.
 Meeting for resolving a bug regarding the scrolling of the chat and the dynamic load of messages. Discussed how to resolve the bug and tested various solutions
 
+
 25/05/22
 Instruct testers on how to use the app and how to do the labelling. APK deployed.
 Chat session on the application with Olgerti Xhanej in order to do labelling and testing power consumption. Moreover we have found and then solved some bugs.
 
+
 26/05/22
 Chat Sessions for acquire new data. More power consumption tests done.
 Meeting for discussing results and improving textual classifier performance.
+
+
+27/05/22
+Meeting for discussing new tests about power consumption
+
+
+28/05/22
+More power consumptions test done
+
+
 
 
