@@ -1,7 +1,7 @@
 MASSAGLI LORENZO
 
-Total Commits: 
-Number of lines of code:
+Total Commits: 12
+Number of lines of code: 2212
  
 
 Diary of non-coding activities:
@@ -44,3 +44,11 @@ Group Meeting: Discussion about App finalization. Setting up of experiment to be
 23/05/2022
 
 Commented the code and the jupyter notebooks
+
+26/05/2022
+
+Group Meeting: Meeting for discussing results and improving textual classifier performance.
+
+29/05/2022
+
+Group Meeting: Meeting about model and power consumption tests and final review of all the documentation. 
