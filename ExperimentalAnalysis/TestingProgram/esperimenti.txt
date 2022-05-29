@@ -46,7 +46,7 @@ Oneplus 7T (Olgerti):
     Wifi Data Transferred: 	211.18 MB total (109.48 MB received, 101.70 MB transmitted)
 
 
-Oneplus 7T (Olgerti): 
+Oneplus Nord (Francesco): 
     Device Estimated Power Usage: 0.22%
     Wifi Data Transferred:  106.11 MB total (53.76 MB received, 52.34 MB transmitted)
 
