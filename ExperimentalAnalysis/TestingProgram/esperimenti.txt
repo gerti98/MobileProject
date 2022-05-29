@@ -11,26 +11,9 @@ Oneplus 7T (Olgerti):
     Device Estimated Power Usage: 0.03%
     Wifi Data Transferred: 0.78 MB total (0.60 MB received, 184.04 KB transmitted)
 
-
-#2 ------------------------------------------------------------
-9 text, 1 audio (max)
-
-Oneplus 7T (Olgerti): 
-    Device Estimated Power Usage: 0.13%
-    Wifi Data Transferred: 69.61 MB total (35.60 MB received, 34.01 MB transmitted)transmitted)
-
-
-#3 ------------------------------------------------------------
-7 text, 3 audio (max)
-
-Oneplus 7T (Olgerti): 
-    Device Estimated Power Usage: 0.34%
-    Wifi Data Transferred: 	211.18 MB total (109.48 MB received, 101.70 MB transmitted)
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#1 ------------------------------------------------------------
-10 text
+Oneplus Nord (Francesco): 
+    Device Estimated Power Usage: 0.04%%
+    Wifi Data Transferred: 	383.66 KB total (297.09 KB received, 86.57 KB transmitted)
 
 Mi 10 Lite 5G (Niko): 
     Device Estimated Power Usage: 0.05%
@@ -40,6 +23,16 @@ Mi 10 Lite 5G (Niko):
 #2 ------------------------------------------------------------
 9 text, 1 audio (max)
 
+Oneplus 7T (Olgerti): 
+    Device Estimated Power Usage: 0.13%
+    Wifi Data Transferred: 69.61 MB total (35.60 MB received, 34.01 MB transmitted)transmitted)
+
+
+Oneplus Nord (Francesco): 
+    Device Estimated Power Usage: 0.06%%
+    Wifi Data Transferred: 	25.52 MB total (13.16 MB received, 12.37 MB transmitted)
+
+
 Mi 10 Lite 5G (Niko): 
     Device Estimated Power Usage: 0.37%
     Wifi Data Transferred: 67.75 MB total (34.38 MB received, 33.36 MB transmitted)
@@ -48,8 +41,20 @@ Mi 10 Lite 5G (Niko):
 #3 ------------------------------------------------------------
 7 text, 3 audio (max)
 
+Oneplus 7T (Olgerti): 
+    Device Estimated Power Usage: 0.34%
+    Wifi Data Transferred: 	211.18 MB total (109.48 MB received, 101.70 MB transmitted)
+
+
+Oneplus 7T (Olgerti): 
+    Device Estimated Power Usage: 0.22%
+    Wifi Data Transferred:  106.11 MB total (53.76 MB received, 52.34 MB transmitted)
+
 Mi 10 Lite 5G (Niko): 
     Device Estimated Power Usage: 1.10%
     Wifi Data Transferred: 	225.87 MB total (106.92 MB received, 118.96 MB transmitted)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
