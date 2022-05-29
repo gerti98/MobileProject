@@ -5,7 +5,7 @@ Tempo per esperimento: 20min
 Riapertura: 15s
 
 #1 ------------------------------------------------------------
-10 messaggi testo
+10 text
 
 Oneplus 7T (Olgerti): 
     Device Estimated Power Usage: 0.03%
@@ -26,4 +26,30 @@ Oneplus 7T (Olgerti):
 Oneplus 7T (Olgerti): 
     Device Estimated Power Usage: 0.34%
     Wifi Data Transferred: 	211.18 MB total (109.48 MB received, 101.70 MB transmitted)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#1 ------------------------------------------------------------
+10 text
+
+Mi 10 Lite 5G (Niko): 
+    Device Estimated Power Usage: 0.05%
+    Wifi Data Transferred: 0.68 MB total (0.53 MB received, 161.32 KB transmitted)
+
+
+#2 ------------------------------------------------------------
+9 text, 1 audio (max)
+
+Mi 10 Lite 5G (Niko): 
+    Device Estimated Power Usage: 0.37%
+    Wifi Data Transferred: 67.75 MB total (34.38 MB received, 33.36 MB transmitted)
+
+
+#3 ------------------------------------------------------------
+7 text, 3 audio (max)
+
+Mi 10 Lite 5G (Niko): 
+    Device Estimated Power Usage: 1.10%
+    Wifi Data Transferred: 	225.87 MB total (106.92 MB received, 118.96 MB transmitted)
+
 
