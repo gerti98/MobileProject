@@ -1,7 +1,7 @@
 NIKO SALAMINI
 
 Total Commits: 20
-Number of lines of code:
+Number of lines of code: ~2000
 
 Diary of non-coding activities:
 
