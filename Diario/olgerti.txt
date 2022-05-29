@@ -1,9 +1,9 @@
 OLGERTI XHANEJ
 
-Total Commits: 
-Number of lines of code:
- 
+Total Commits: 25
+Number of lines of code: ~2700
 
+ 
 Diary of non-coding activities:
 
 30/04/2022
@@ -38,6 +38,7 @@ Searching for candidates to join for experiment purposes.
 Preparing guide for candidates to perform labeling of messages.
 
 24/05/2022
+
 Searching for candidates to join for experiment purposes.
 Performing labeling through the application.
 Group Meeting: discussed about last experiments to be performed, and parameters to be set to perform power usage comparison.
@@ -46,7 +47,6 @@ Group Meeting: discussed about last experiments to be performed, and parameters 
 Performing labeling through the application.
 Distributing apk file to candidates and giving support for executing the app.
 
-
 26/05/2022
 Performing labeling through the application.
 
@@ -54,3 +54,6 @@ Performing labeling through the application.
 Performing labeling through the application.
 Team meeting: explanation on how to run the script for the experiment about power usage
 Running experiment about power usage
+
+29/05/2022
+Finalizing deliverables for project, analyzing test result for power consumption experiment.
