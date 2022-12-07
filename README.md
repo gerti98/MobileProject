@@ -10,9 +10,10 @@ Project carried out as part of the *Mobile and Social Sensing Systems* Exam for 
 A brief presentation concerning technical challenges and results can be found [here](https://github.com/gerti98/MobileProject/blob/main/Presentation/Presentazione%20Finale-UPDATED.pptx).
 
 ## Tech Stack
- - Android App: Java
- - Model training and deployment: Tensorflow (Python) and Heroku
- - Data Storage and model deployment: Firebase
+
+ - *Android App*: Java
+ - *Model training and deployment*: Tensorflow (Python) and Heroku
+ - *Data Storage*: Firebase
  
 ## Screenshots
 
